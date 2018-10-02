@@ -1,0 +1,116 @@
+<html>
+  
+<head>
+<title>Sleepwalk</title>
+</head>
+
+<body>
+
+<table>
+  <tr>
+    <td><svg id="chart0"></svg></td>
+    <td width="60px"></td>
+    <td><svg id="chart1"></svg></td>
+    <td width="60px"></td>
+    <td><svg id="chart2"></svg></td>
+  </tr>
+  <tr>
+    <td><svg id="chart3"></svg></td>
+    <td width="60px"></td>
+    <td><svg id="chart4"></svg></td>
+    <td width="60px"></td>
+    <td><svg id="chart5"></svg></td>
+  </tr>
+  <tr>
+    <td><svg id="chart6"></svg></td>
+    <td width="60px"></td>
+    <td><svg id="chart7"></svg></td>
+    <td width="60px"></td>
+    <td><svg id="chart8"></svg></td>
+  </tr>
+</table>
+
+<script src="d3.v5.min.js"></script>
+
+<script>
+
+width = 500
+
+n_charts = 2
+
+set_up_chart = function() {
+
+   scale = []
+   distanceScale = []
+   colorScale = []
+
+   make_colorScale = function( distanceScale ) {
+      return function( d ) {
+         return d3.interpolateCubehelixDefault( distanceScale(d) )
+      }      
+   }
+
+   for( var ch = 0; ch < n_charts; ch++ ) {
+
+	   scale[ch] = d3.scaleLinear()
+	      .domain( [ 
+	   	   d3.min( embedding[ch].map( function(x) { return( d3.min(x) ) } ) ), 
+	    	   d3.max( embedding[ch].map( function(x) { return( d3.max(x) ) } ) ) ] )
+	      .range( [ 0, width ] )
+
+	   distanceScale = d3.scaleLinear()
+	      .domain( [ 0, maxdist[ch] ] )
+	      .range( [ 0, .8 ] )
+	      .clamp( true )      
+
+	   colorScale[ch] = make_colorScale( distanceScale )
+   }
+
+   for( var ch = 0; ch < n_charts; ch++ ) {
+	   d3.select( "#chart" + ch )
+	      .attr( "width", width )
+	      .attr( "height", width )
+	      .selectAll("circle")
+	      .data( embedding[ch] )
+	      .enter().append( "circle" )
+	         .attr( "cx", function(d) { return scale[ch]( d[0] ) } )
+	         .attr( "cy", function(d) { return scale[ch]( d[1] ) } )
+	         .attr( "r", 1.5 )
+	         .attr( "stroke", 0 )
+	         .attr( "fill", "gray" )
+
+      
+      on_mouse_over = ( function(ch) {
+         return function( d, i ) { new_center_cell( ch, i )}
+      })( ch )
+      d3.select( "#chart" + ch )
+         .selectAll("circle")
+	         .on( "mouseover", on_mouse_over )            
+   }
+}
+
+new_center_cell = function( chart, cell ) {
+
+   var x_sel_cell = featureMatrix[chart][ cell ]
+   var distCols = Array( embedding[0].length )
+   for( var j = 0; j < distCols.length; j++ ) {
+      var s = 0
+      for( var i = 0; i < x_sel_cell.length; i++ ) {
+         var dd = x_sel_cell[i] - featureMatrix[chart][j][i]
+         s += dd * dd
+      }
+      distCols[j] = colorScale[chart](s)
+   }
+
+   for( i = 0; i < n_charts; i++ ) {
+      d3.select( "#chart" + i )
+         .selectAll("circle")
+         .data( distCols )
+         .attr( "fill", function( d ) { return d } )
+   }
+}
+
+</script>
+</body>
+
+</html>
