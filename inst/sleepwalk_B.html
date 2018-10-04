@@ -33,6 +33,11 @@
 <script src="d3.v5.min.js"></script>
 
 <script>
+
+width = 500
+
+n_charts = 2
+
 deeprange = function(a) {
    var min = Infinity
    var max = -Infinity
@@ -50,13 +55,6 @@ deeprange = function(a) {
    }
    return [ min, max ]
 }
-</script>
-
-<script>
-
-width = 500
-
-n_charts = 2
 
 set_up_chart = function() {
 
@@ -73,13 +71,11 @@ set_up_chart = function() {
    for( var ch = 0; ch < n_charts; ch++ ) {
 
 	   scale[ch] = d3.scaleLinear()
-	      .domain( deeprange( embedding[ch] ) )
-	   	   //d3.min( embedding[ch].map( function(x) { return( d3.min(x) ) } ) ), 
-	    	 //   d3.max( embedding[ch].map( function(x) { return( d3.max(x) ) } ) ) ] )
+	      .domain( deeprange( embedding ) )
 	      .range( [ 0, width ] )
 
 	   distanceScale = d3.scaleLinear()
-	      .domain( [ 0, maxdist[ch] ] )
+	      .domain( [ 0, maxdist ] )
 	      .range( [ 0, .8 ] )
 	      .clamp( true )      
 
@@ -112,21 +108,24 @@ set_up_chart = function() {
 new_center_cell = function( chart, cell ) {
 
    var x_sel_cell = featureMatrix[chart][ cell ]
-   var distCols = Array( embedding[0].length )
-   for( var j = 0; j < distCols.length; j++ ) {
-      var s = 0
-      for( var i = 0; i < x_sel_cell.length; i++ ) {
-         var dd = x_sel_cell[i] - featureMatrix[chart][j][i]
-         s += dd * dd
-      }
-      distCols[j] = colorScale[chart](s)
-   }
 
-   for( i = 0; i < n_charts; i++ ) {
-      d3.select( "#chart" + i )
+   for( ch = 0; ch < n_charts; ch++ ) {
+
+      var distCols = Array( embedding[ch].length )
+      for( var j = 0; j < distCols.length; j++ ) {
+         var s = 0
+         for( var i = 0; i < x_sel_cell.length; i++ ) {
+            var dd = x_sel_cell[i] - featureMatrix[ch][j][i]
+            s += dd * dd
+         }
+         distCols[j] = colorScale[ch](s)
+      }
+
+      d3.select( "#chart" + ch )
          .selectAll("circle")
          .data( distCols )
          .attr( "fill", function( d ) { return d } )
+
    }
 }
 
