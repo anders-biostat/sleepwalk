@@ -7,7 +7,7 @@
 
 <body>
 
-<table>
+<table id="embeddings">
   <tr>
     <td><svg id="chart0"></svg></td>
     <td width="60px"></td>
@@ -60,6 +60,8 @@ width = 500;
 
 n_charts = 2;
 
+mode = "A";
+
 set_up_chart = function() {
 
    scale = [];
@@ -75,13 +77,13 @@ set_up_chart = function() {
    for( var ch = 0; ch < n_charts; ch++ ) {
 
 	   scale[ch] = d3.scaleLinear()
-	      .domain( deeprange( embedding[ch] ) )
+	      .domain( deeprange( (mode == "A" ? embedding[ch] : embedding) ) )
 	   	   //d3.min( embedding[ch].map( function(x) { return( d3.min(x) ) } ) ), 
 	    	 //   d3.max( embedding[ch].map( function(x) { return( d3.max(x) ) } ) ) ] )
 	      .range( [ 0, width ] );
 
 	   distanceScale = d3.scaleLinear()
-	      .domain( [ 0, maxdist[ch] ] )
+	      .domain( (mode == "A" ? [ 0, maxdist[ch] ] : [ 0, maxdist ]) )
 	      .range( [ 0, .8 ] )
 	      .clamp( true );
 
@@ -104,14 +106,14 @@ set_up_chart = function() {
 
       
       on_mouse_over = ( function(ch) {
-         return function( d, i ) { new_center_cell( ch, i )}
+         return function( d, i ) { window["new_center_cell_" + mode]( ch, i )}
       })( ch );
       d3.select( "#chart" + ch )
          .selectAll("circle")
 	         .on( "mouseover", on_mouse_over );
 
       d3.select("#chart" + ch)
-         .call(function() {
+         .call(function(ch) {
             var lasso = d3.lasso()
                .items(d3.select("#chart" + ch).selectAll("circle"))
                .closePathDistance(75)
@@ -119,25 +121,36 @@ set_up_chart = function() {
                .on("end", function() {
                   if(!lasso.selectedItems().empty()) {
                      var selInds = lasso.selectedItems().data().map(el => el[2]);
-                     
-                     d3.selectAll(".point")
-                        .filter(d => (selInds.indexOf(d[2]) == -1))
+
+                     if(mode == "A")
+                        d3.selectAll(".point")
+                           .filter(d => (selInds.indexOf(d[2]) == -1))
+                              .classed("not_selected", true)
+                     else
+                        lasso.notSelectedItems()
                            .classed("not_selected", true);
 
-                     jrc.sendData("sPoints", selInds);
+
+                     jrc.sendData("sPoints", selInds.map(el => el + 1));
                   }
                })
                .on("start", function() {
-                  d3.selectAll(".point")
+                  var container;
+                  if(mode == "A")
+                     container = d3.select("#embeddings")
+                  else
+                     container = d3.select("#chart" + ch);
+
+                  container.selectAll(".point")
                      .classed("not_selected", false);
                });
             return lasso;
-         }());
+         }(ch));
 
    }
 }
 
-new_center_cell = function( chart, cell ) {
+new_center_cell_A = function( chart, cell ) {
 
    var x_sel_cell = featureMatrix[chart][ cell ]
    var distCols = Array( embedding[0].length )
@@ -154,6 +167,29 @@ new_center_cell = function( chart, cell ) {
       d3.select( "#chart" + i )
          .selectAll(".point")
          .attr( "fill", function( d, i ) { return distCols[i] } )
+   }
+}
+
+new_center_cell_B = function( chart, cell ) {
+
+   var x_sel_cell = featureMatrix[chart][ cell ]
+
+   for( ch = 0; ch < n_charts; ch++ ) {
+
+      var distCols = Array( embedding[ch].length )
+      for( var j = 0; j < distCols.length; j++ ) {
+         var s = 0
+         for( var i = 0; i < x_sel_cell.length; i++ ) {
+            var dd = x_sel_cell[i] - featureMatrix[ch][j][i]
+            s += dd * dd
+         }
+         distCols[j] = colorScale[ch](s)
+      }
+
+      d3.select( "#chart" + ch )
+         .selectAll("circle")
+         .attr( "fill", function( d, i ) { return distCols[i] } )
+
    }
 }
 

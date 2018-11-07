@@ -46,7 +46,8 @@ sleepwalkMulti_B <- function( embeddings, featureMatrices, maxdists ) {
     stopifnot( ncol( featureMatrices[[i]] ) == ncol( featureMatrices[[1]] ) )
   }
   
-  JsRCom::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk_B.html" )
+  JsRCom::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk.html" )
+  JsRCom::sendData( "mode", "B" )
   JsRCom::sendData( "n_charts", length(embeddings) )
   JsRCom::sendData( "maxdist", maxdists )
   JsRCom::sendData( "embedding", embeddings )
