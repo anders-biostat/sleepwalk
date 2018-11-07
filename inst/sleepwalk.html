@@ -2,6 +2,7 @@
   
 <head>
 <title>Sleepwalk</title>
+<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
@@ -31,6 +32,7 @@
 </table>
 
 <script src="d3.v5.min.js"></script>
+<script src="d3-lasso.min.js"></script>
 
 <script>
 deeprange = function(a) {
@@ -54,19 +56,19 @@ deeprange = function(a) {
 
 <script>
 
-width = 500
+width = 500;
 
-n_charts = 2
+n_charts = 2;
 
 set_up_chart = function() {
 
-   scale = []
-   distanceScale = []
-   colorScale = []
+   scale = [];
+   distanceScale = [];
+   colorScale = [];
 
    make_colorScale = function( distanceScale ) {
       return function( d ) {
-         return d3.interpolateCubehelixDefault( distanceScale(d) )
+         return d3.interpolateCubehelixDefault( distanceScale(d) );
       }      
    }
 
@@ -76,36 +78,62 @@ set_up_chart = function() {
 	      .domain( deeprange( embedding[ch] ) )
 	   	   //d3.min( embedding[ch].map( function(x) { return( d3.min(x) ) } ) ), 
 	    	 //   d3.max( embedding[ch].map( function(x) { return( d3.max(x) ) } ) ) ] )
-	      .range( [ 0, width ] )
+	      .range( [ 0, width ] );
 
 	   distanceScale = d3.scaleLinear()
 	      .domain( [ 0, maxdist[ch] ] )
 	      .range( [ 0, .8 ] )
-	      .clamp( true )      
+	      .clamp( true );
 
-	   colorScale[ch] = make_colorScale( distanceScale )
+	   colorScale[ch] = make_colorScale( distanceScale );
    }
 
    for( var ch = 0; ch < n_charts; ch++ ) {
-	   d3.select( "#chart" + ch )
+      d3.select( "#chart" + ch )
 	      .attr( "width", width )
 	      .attr( "height", width )
 	      .selectAll("circle")
-	      .data( embedding[ch] )
+	      .data( embedding[ch].map((el, i) => el.concat(i)) )
 	      .enter().append( "circle" )
 	         .attr( "cx", function(d) { return scale[ch]( d[0] ) } )
 	         .attr( "cy", function(d) { return scale[ch]( d[1] ) } )
 	         .attr( "r", 1.5 )
+            .attr( "class", "point" )
 	         .attr( "stroke", 0 )
-	         .attr( "fill", "gray" )
+	         .attr( "fill", "gray" );
 
       
       on_mouse_over = ( function(ch) {
          return function( d, i ) { new_center_cell( ch, i )}
-      })( ch )
+      })( ch );
       d3.select( "#chart" + ch )
          .selectAll("circle")
-	         .on( "mouseover", on_mouse_over )            
+	         .on( "mouseover", on_mouse_over );
+
+      d3.select("#chart" + ch)
+         .call(function() {
+            var lasso = d3.lasso()
+               .items(d3.select("#chart" + ch).selectAll("circle"))
+               .closePathDistance(75)
+               .targetArea(d3.select("#chart" + ch))
+               .on("end", function() {
+                  if(!lasso.selectedItems().empty()) {
+                     var selInds = lasso.selectedItems().data().map(el => el[2]);
+                     
+                     d3.selectAll(".point")
+                        .filter(d => (selInds.indexOf(d[2]) == -1))
+                           .classed("not_selected", true);
+
+                     jrc.sendData("sPoints", selInds);
+                  }
+               })
+               .on("start", function() {
+                  d3.selectAll(".point")
+                     .classed("not_selected", false);
+               });
+            return lasso;
+         }());
+
    }
 }
 
@@ -124,9 +152,8 @@ new_center_cell = function( chart, cell ) {
 
    for( i = 0; i < n_charts; i++ ) {
       d3.select( "#chart" + i )
-         .selectAll("circle")
-         .data( distCols )
-         .attr( "fill", function( d ) { return d } )
+         .selectAll(".point")
+         .attr( "fill", function( d, i ) { return distCols[i] } )
    }
 }
 
