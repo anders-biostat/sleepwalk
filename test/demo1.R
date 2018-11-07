@@ -101,6 +101,6 @@ tsne_G1 <- Rtsne( pca$x[cellGroup1,], pca=FALSE, verbose=TRUE )
 tsne_G2 <- Rtsne( pca$x[cellGroup2,], pca=FALSE, verbose=TRUE )
 
 sleepwalkMulti_B( 
-  list( tsneRNA$Y, tsneRNA_G1$Y, tsneRNA_G2$Y ), 
+  list( tsneRNA$Y, tsne_G1$Y, tsne_G2$Y ), 
   list( pca$x, pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
   .002 )
