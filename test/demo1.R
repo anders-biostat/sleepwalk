@@ -101,6 +101,18 @@ tsne_G1 <- Rtsne( pca$x[cellGroup1,], pca=FALSE, verbose=TRUE )
 tsne_G2 <- Rtsne( pca$x[cellGroup2,], pca=FALSE, verbose=TRUE )
 
 sleepwalkMulti_B( 
-  list( tsneRNA$Y, tsneRNA_G1$Y, tsneRNA_G2$Y ), 
+  list( tsneRNA$Y, tsne_G1$Y, tsne_G2$Y ), 
   list( pca$x, pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
   .002 )
+
+# now the sleepwalk with dual 
+means <- apply( exprsRNA, 1, mean )
+vars <- apply( exprsRNA, 1, var )
+plot( means, vars/means, pch=".", log="xy" )
+abline( h=1e-3 )
+goodGenes <- names( which( vars/means > 1e-3 ) )
+
+distGenes <- acos( cor( t(exprsRNA[ goodGenes, ]), method="spearman") ) / pi
+tsneDual <- Rtsne( acos( genecors )/pi, is_distance = TRUE )
+
+sleepwalk( tsneDual$Y, , .003 )
