@@ -31,10 +31,11 @@ sleepwalkMulti <- function( embeddings, featureMatrices, maxdists, same = c( "ob
        stopifnot( ncol( featureMatrices[[i]] ) == ncol( featureMatrices[[1]] ) )
   }
 
+  JsRCom::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk.html" )
   if( same == "objects" ) 
-     JsRCom::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk.html" )
+     JsRCom::sendData( "mode", "A" )
   else
-     JsRCom::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk_B.html" )
+     JsRCom::sendData( "mode", "B" )
   JsRCom::sendData( "n_charts", length(embeddings) )
   JsRCom::sendData( "maxdist", maxdists )
   JsRCom::sendData( "embedding", embeddings )

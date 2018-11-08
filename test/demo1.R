@@ -92,18 +92,20 @@ sleepwalkMulti(
 # To demonstrate the other multi view mode, let's divide up the RNA data
 cellGroup1 <- sample( colnames(countsRNA), ncol(countsRNA)/3 )
 cellGroup2 <- setdiff( colnames(countsRNA), cellGroup1 )
-sleepwalkMulti_B( 
+sleepwalkMulti( 
   list( tsneRNA$Y[cellGroup1,], tsneRNA$Y[cellGroup2,] ), 
   list( pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
-  .002 )
+  .002,
+  same="features" )
 
 tsne_G1 <- Rtsne( pca$x[cellGroup1,], pca=FALSE, verbose=TRUE )
 tsne_G2 <- Rtsne( pca$x[cellGroup2,], pca=FALSE, verbose=TRUE )
 
-sleepwalkMulti_B( 
+sleepwalkMulti( 
   list( tsneRNA$Y, tsne_G1$Y, tsne_G2$Y ), 
   list( pca$x, pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
-  .002 )
+  .002,
+  same="features")
 
 # now the sleepwalk with dual 
 means <- apply( exprsRNA, 1, mean )
