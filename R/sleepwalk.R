@@ -1,14 +1,15 @@
-sleepwalk <- function( embedding, featureMatrix, maxdist ) {
+sleepwalk <- function( embedding, featureMatrix, maxdist, pointSize = 1.5 ) {
   stopifnot( length( dim( embedding ) ) == 2 )
   stopifnot( length( dim( featureMatrix ) ) == 2 )
   stopifnot( ncol( embedding ) == 2 )
   stopifnot( nrow( embedding ) == nrow( featureMatrix ) )
   stopifnot( is.numeric( maxdist ) && length( maxdist ) == 1 )
+  stopifnot( is.numeric(pointSize) && length(pointSize) == 1 )
 
-  sleepwalkMulti( list( embedding ), list( featureMatrix ), maxdist )
+  sleepwalkMulti( list( embedding ), list( featureMatrix ), maxdist, pointSize = pointSize )
 }
 
-sleepwalkMulti <- function( embeddings, featureMatrices, maxdists, same = c( "objects", "features" ) ) {
+sleepwalkMulti <- function( embeddings, featureMatrices, maxdists, pointSize = 1.5, same = c( "objects", "features" ) ) {
   same = match.arg( same )
   
   stopifnot( length(embeddings) <= 9 )
@@ -19,7 +20,8 @@ sleepwalkMulti <- function( embeddings, featureMatrices, maxdists, same = c( "ob
      stopifnot( length(maxdists) == 1 )
   stopifnot( is.list(embeddings) )
   stopifnot( is.list(featureMatrices) )
-
+  stopifnot( is.numeric(pointSize) && length(pointSize) == 1 )
+  
   for( i in 1:length(embeddings) ) {
      stopifnot( length( dim( embeddings[[i]] ) ) == 2 )
      stopifnot( length( dim( featureMatrices[[i]] ) ) == 2 )
@@ -40,5 +42,6 @@ sleepwalkMulti <- function( embeddings, featureMatrices, maxdists, same = c( "ob
   JsRCom::sendData( "maxdist", maxdists )
   JsRCom::sendData( "embedding", embeddings )
   JsRCom::sendData( "featureMatrix", featureMatrices )
+  JsRCom::sendData( "pointSize", pointSize )
   JsRCom::sendCommand( "set_up_chart()" )
 }
