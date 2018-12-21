@@ -72,7 +72,11 @@ set_up_chart = function() {
   	axisScales = [];
   	embeddingScales = [];
 
-   scaleDist = maxdist.slice();
+  	//this is to allow independent change in scales even for
+  	//"features" mode. May be changed later.
+   maxdist.length == n_charts ? 
+   	scaleDist = maxdist.slice() :
+   	scaleDist = d3.range(n_charts).map(e => maxdist[0]);
 
    for( var ch = 0; ch < n_charts; ch++ ) {
 		//define all the scales   	
@@ -252,23 +256,24 @@ var updateColour = function(chart) {
 }
 
 new_center_cell_A = function() {
+   for( ch = 0; ch < n_charts; ch++ ) {
 
-   var x_sel_cell = featureMatrix[ centerCell[0] ][ centerCell[1] ]
-   var distCols = Array( embedding[0].length )
-   for( var j = 0; j < distCols.length; j++ ) {
-      var s = 0
-      for( var i = 0; i < x_sel_cell.length; i++ ) {
-         var dd = x_sel_cell[i] - featureMatrix[centerCell[0]][j][i]
-         s += dd * dd
-      }
-      distCols[j] = colourScales[centerCell[0]](s)
-   }
-
-   for( i = 0; i < n_charts; i++ ) {
-      d3.select( "#chart" + i )
-         .selectAll(".point")
-         .attr( "fill", function( d, i ) { return distCols[i] } )
-   }
+	   var x_sel_cell = featureMatrix[ ch ][ centerCell[1] ]
+	   
+	   var dists = Array( embedding[0].length )
+	   
+	   for( var j = 0; j < dists.length; j++ ) {
+	      var s = 0
+	      for( var i = 0; i < x_sel_cell.length; i++ ) {
+	         var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
+	         s += dd * dd;
+	      }
+	      dists[j] = Math.sqrt(s);
+	   }
+	      d3.select( "#chart" + ch )
+	         .selectAll(".point")
+	         .attr( "fill", function( d, i ) { return colourScales[ch](dists[i]) } )
+	}
 }
 
 new_center_cell_B = function() {

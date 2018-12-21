@@ -39,9 +39,9 @@ sleepwalkMulti <- function( embeddings, featureMatrices, maxdists, pointSize = 1
   else
      JsRCom::sendData( "mode", "B" )
   JsRCom::sendData( "n_charts", length(embeddings) )
-  JsRCom::sendData( "maxdist", maxdists )
-  JsRCom::sendData( "embedding", embeddings )
-  JsRCom::sendData( "featureMatrix", featureMatrices )
+  JsRCom::sendData( "maxdist", maxdists, TRUE )
+  JsRCom::sendData( "embedding", embeddings, TRUE )
+  JsRCom::sendData( "featureMatrix", featureMatrices, TRUE )
   JsRCom::sendData( "pointSize", pointSize )
   JsRCom::sendCommand( "set_up_chart()" )
 }
