@@ -64,51 +64,111 @@ mode = "A";
 
 pointSize = 1.5;
 
+var centerCell;
+
 set_up_chart = function() {
 
-   scale = [];
-   distanceScale = [];
-   colorScale = [];
+  	colourScales = [];
+  	axisScales = [];
+  	embeddingScales = [];
 
-   make_colorScale = function( distanceScale ) {
-      return function( d ) {
-         return d3.interpolateCubehelixDefault( distanceScale(d) );
-      }      
-   }
+   scaleDist = maxdist.slice();
 
    for( var ch = 0; ch < n_charts; ch++ ) {
+		//define all the scales   	
+   	setColourScale(ch); // distance -> colour
+   	setAxisScale(ch);	// distance -> position of the legend axis
+  		embeddingScales[ch] = d3.scaleLinear()  // embedding coordiantes -> position on the plot
+        .domain( deeprange( (mode == "A" ? embedding[ch] : embedding) ) ) 
+        .range( [ 0, width ] );
 
-	   scale[ch] = d3.scaleLinear()
-	      .domain( deeprange( (mode == "A" ? embedding[ch] : embedding) ) )
-	   	   //d3.min( embedding[ch].map( function(x) { return( d3.min(x) ) } ) ), 
-	    	 //   d3.max( embedding[ch].map( function(x) { return( d3.max(x) ) } ) ) ] )
-	      .range( [ 0, width ] );
+	   //define colour gradient for the legend
+	   d3.select("#chart" + ch)
+	    	.append("defs")
+	    		.append("linearGradient")
+	    			.attr("id", "colourLegend")
+	    			.attr("x1", "0%")
+	    			.attr("x2", "100%")
+	    			.attr("y1", "0%")
+	    			.attr("y2", "0%");
 
-	   distanceScale = d3.scaleLinear()
-	      .domain( (mode == "A" ? [ 0, maxdist[ch] ] : [ 0, maxdist ]) )
-	      .range( [ 0, .8 ] )
-	      .clamp( true );
+	   //group of all legend related elements
+      var legend = d3.select("#chart" + ch)
+      	.append("g")
+      		.attr("class", "legend")
+      		.attr("transform", "translate(15, " + width + ")");
 
-	   colorScale[ch] = make_colorScale( distanceScale );
-   }
+     	//here goes the axis
+     	legend
+	 	   .append("g") 
+ 		   	.attr("class", "axis")
+ 	   		.attr("transform", "translate(0, 20)");
 
-   for( var ch = 0; ch < n_charts; ch++ ) {
+ 	   //this is the colour gradient
+      legend.append("rect")
+      	.attr("width", d3.max([width - 40, 0]))
+      	.attr("height", 10)
+      	.attr("y", 20)
+      	.attr("fill", "url(#colourLegend)");
+
+     	//fill all the legend elements
+      updateColour(ch);
+
+      //and buttons to change the colour scales
+      var buttons = legend.append("g")
+      	.attr("class", "buttons")
+      	.attr("transform", "translate(" + d3.max([width - 100, 0]) + ", 35)")
+      	.selectAll(".button").data(["+", "0", "-"].map(e => [e, ch])) //we'll keep the chart number in the data
+      		.enter()
+      			.append("g")
+      				.attr("class", "button")
+      				.attr("transform", (d, i) => "translate(" + (i * 30) + ", 0)")
+      				.on("click", function(d) {
+      					if(d[0] == "+")
+      						scaleDist[d[1]] *= 2;
+      					if(d[0] == "-")
+      						scaleDist[d[1]] /= 2;
+      					if(d[0] == "0")
+      						scaleDist[d[1]] = maxdist[d[1]];
+
+      					setColourScale(d[1]);
+      					setAxisScale(d[1]);
+      					updateColour(d[1]);
+      					window["new_center_cell_" + mode]();
+      				});
+      buttons
+  			.append("rect")
+  				.attr("width", 25) //this is used only once, so keep all the styling here
+  				.attr("height", 15)
+  				.attr("fill", "#aaa")
+  				.style("font-weight", "bold");
+
+  		buttons
+  			.append("text")
+  				.text(d => d[0])
+  				.attr("x", 10)
+  				.attr("y", 13)
+  				.attr("size", 10);
+
+      //add points
       d3.select( "#chart" + ch )
 	      .attr( "width", width )
-	      .attr( "height", width )
-	      .selectAll("circle")
+	      .attr( "height", +width + 75) //75px for the colour legend
+ 	      .selectAll("circle")
 	      .data( embedding[ch].map((el, i) => el.concat(i)) )
 	      .enter().append( "circle" )
-	         .attr( "cx", function(d) { return scale[ch]( d[0] ) } )
-	         .attr( "cy", function(d) { return scale[ch]( d[1] ) } )
+	         .attr( "cx", function(d) { return embeddingScales[ch]( d[0] ) } )
+	         .attr( "cy", function(d) { return embeddingScales[ch]( d[1] ) } )
 	         .attr( "r", pointSize )
             .attr( "class", "point" )
 	         .attr( "stroke", 0 )
 	         .attr( "fill", "gray" );
 
-      
       on_mouse_over = ( function(ch) {
-         return function( d, i ) { window["new_center_cell_" + mode]( ch, i )}
+         return function( d, i ) { 
+         	centerCell = [ch, i];
+         	window["new_center_cell_" + mode]();
+         }
       })( ch );
       d3.select( "#chart" + ch )
          .selectAll("circle")
@@ -152,17 +212,56 @@ set_up_chart = function() {
    }
 }
 
-new_center_cell_A = function( chart, cell ) {
+var colourScheme = function(d) {
+	return d3.interpolateCubehelixDefault(d * 0.8);
+}
 
-   var x_sel_cell = featureMatrix[chart][ cell ]
+var setColourScale = function(chart) {
+   colourScales[chart] = d3.scaleSequential(colourScheme)
+   	.domain([0, scaleDist[chart]])
+   	.clamp(true);
+}
+
+var setAxisScale = function(chart) {
+  axisScales[chart] = d3.scaleLinear()
+   	.domain([0, scaleDist[chart]])
+   	.range([0, d3.max([width - 40, 0])])
+   	.nice();
+}
+
+var updateColour = function(chart) {
+	//change legend axis
+	d3.axisTop()
+		.scale(axisScales[chart])
+		(d3.select("#chart" + chart)
+			.select(".legend")
+				.select(".axis").transition(1000));
+
+	//change legend gradient
+	var stops = d3.select("#chart" + chart)
+		.select("defs")
+			.select("#colourLegend")
+				.selectAll("stop")
+					.data(d3.range(6).map(e => e/5));
+	stops.enter()
+		.append("stop")
+		.style("stop-opacity", 1)
+		.merge(stops)
+			.attr("offset", d => d * 100 + "%")
+			.style("stop-color", d => colourScales[chart](d * scaleDist[chart]));
+}
+
+new_center_cell_A = function() {
+
+   var x_sel_cell = featureMatrix[ centerCell[0] ][ centerCell[1] ]
    var distCols = Array( embedding[0].length )
    for( var j = 0; j < distCols.length; j++ ) {
       var s = 0
       for( var i = 0; i < x_sel_cell.length; i++ ) {
-         var dd = x_sel_cell[i] - featureMatrix[chart][j][i]
+         var dd = x_sel_cell[i] - featureMatrix[centerCell[0]][j][i]
          s += dd * dd
       }
-      distCols[j] = colorScale[chart](s)
+      distCols[j] = colourScales[centerCell[0]](s)
    }
 
    for( i = 0; i < n_charts; i++ ) {
@@ -172,9 +271,9 @@ new_center_cell_A = function( chart, cell ) {
    }
 }
 
-new_center_cell_B = function( chart, cell ) {
+new_center_cell_B = function() {
 
-   var x_sel_cell = featureMatrix[chart][ cell ]
+   var x_sel_cell = featureMatrix[centerCell[0]][ centerCell[1] ]
 
    for( ch = 0; ch < n_charts; ch++ ) {
 
@@ -185,7 +284,7 @@ new_center_cell_B = function( chart, cell ) {
             var dd = x_sel_cell[i] - featureMatrix[ch][j][i]
             s += dd * dd
          }
-         distCols[j] = colorScale[ch](s)
+         distCols[j] = colourScales[ch](s)
       }
 
       d3.select( "#chart" + ch )
