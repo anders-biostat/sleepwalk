@@ -22,10 +22,21 @@
 div.contentContainer {
   padding-top: 60px;
   padding-bottom: 40px;
-  padding-left: 290px;
+  padding-left: 300px;
   width: 60%;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 150%;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #222;
+}
+
+div.contentContainer a {
+	text-decoration: none;
+	color: #2660A4;
+}
+
+div.contentContainer a:hover {
+	color: black;
 }
 
 section#content {
@@ -35,7 +46,7 @@ section#content {
 nav.tocContainer {
   display: block;
   position: absolute;
-  font-family: 'Varela Round', sans-serif;
+  font-family: 'Varela', sans-serif;
   left: 50px;
   width: 200px;
   border: 2px solid black;
@@ -56,3 +67,4 @@ nav.tocContainer {
   height: 100%;
   left: 0; top: 0;  
 }
+

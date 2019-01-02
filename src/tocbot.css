@@ -7,28 +7,20 @@
 	position: relative;
 }
 
-.toc > ul li {
-	list-style: none
-}
-
 .toc-list {
 	margin: 0;
 	width: 100%;
 	padding-left: 10px;
-	list-style-type: none;
+	list-style-type: none; 
 }
 
 a.toc-link {
 	text-decoration: none;
-  color: black;
-	height: 100%;
-	line-height: 100%;
-	font-size: 120%;
+  color: #2660A4;;
 }
 
 a.toc-link:hover {
-	color: #f57604;
-	text-shadow: 0 0 30px black;
+	color: black;
 }
 
 .is-collapsible {
