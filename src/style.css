@@ -54,6 +54,23 @@ nav.tocContainer {
   padding: 15px 15px 15px 15px;
 }
 
+div.contentContainer h1 {
+	width: 45%;
+	padding: 10px 0px 10px 10px;
+	font-family: 'Varela Round', sans-serif;
+	background-color: black;
+	color: white;
+	text-shadow: 3px 3px 6px #f57604;
+	font-size: 1.8em;
+}
+
+div.contentContainer h2 {
+	font-family: 'Varela Round', sans-serif;
+	color: #f57604;
+	font-size: 1.5em;
+	font-weight: normal;
+}
+
 .aspect-ratio {
   position: relative;
   width: 100%;
