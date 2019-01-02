@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+
+    {% if site.google_analytics %}
+      <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ site.google_analytics }}');
+      </script>
+    {% endif %}
+    <meta charset="UTF-8">
+
+{% seo %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link href="https://fonts.googleapis.com/css?family=Handlee|Varela+Round" rel="stylesheet">
+    <link rel="stylesheet" href="{{ 'src/style.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ 'src/tocbot.css' | relative_url}}">
+  </head>
+  <body>
+    <a href="https://github.com/anders-biostat/sleepwalk"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+    <header class="page-header" role="banner">
+      <h1 class="project-name">{{ site.title }}</h1>
+      <h2 class="project-description">{{ site.description }}</h2>
+      <iframe src="https://ghbtns.com/github-btn.html?user=anders-biostat&repo=sleepwalk&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+    </header>
+
+    <div class="contentContainer">
+      <nav class="tocContainer" id="toc"></nav>
+      <section id="content">
+        {{ content }}      
+      </section>
+    </div>
+
+    <script type="text/javascript" src="{{'src/tocbot.min.js' | relative_url}}"></script>
+    <script type="text/javascript">
+      tocbot.init({
+        tocSelector: '#toc',
+        contentSelector: '#content',
+        headingSelector: 'h1, h2, h3, h4',
+        positionFixedSelector: ".tocContainer"
+      });
+      tocbot.refresh();
+    </script>
+  </body>
+</html>
