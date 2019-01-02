@@ -121,8 +121,8 @@ set_up_chart = function() {
       //and buttons to change the colour scales
       var buttons = legend.append("g")
       	.attr("class", "buttons")
-      	.attr("transform", "translate(" + d3.max([width - 100, 0]) + ", 35)")
-      	.selectAll(".button").data(["+", "0", "-"].map(e => [e, ch])) //we'll keep the chart number in the data
+      	.attr("transform", "translate(" + d3.max([width - 70, 0]) + ", 35)")
+      	.selectAll(".button").data(["-", "+"].map(e => [e, ch])) //we'll keep the chart number in the data
       		.enter()
       			.append("g")
       				.attr("class", "button")
@@ -132,8 +132,6 @@ set_up_chart = function() {
       						scaleDist[d[1]] *= 2;
       					if(d[0] == "-")
       						scaleDist[d[1]] /= 2;
-      					if(d[0] == "0")
-      						scaleDist[d[1]] = maxdist[d[1]];
 
       					setColourScale(d[1]);
       					setAxisScale(d[1]);
@@ -150,9 +148,9 @@ set_up_chart = function() {
   		buttons
   			.append("text")
   				.text(d => d[0])
-  				.attr("x", 10)
-  				.attr("y", 13)
-  				.attr("size", 10);
+  				.attr("x", 11)
+  				.attr("y", 11)
+  				.attr("size", 13);
 
       //add points
       d3.select( "#chart" + ch )

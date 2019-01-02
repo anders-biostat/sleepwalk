@@ -49,7 +49,7 @@ tsneRNA <- Rtsne( pca$x, pca=FALSE, verbose=TRUE )
 rownames(tsneRNA$Y) <- rownames(pca$x)
 
 # Explore the result with sleepwalk
-sleepwalk( tsneRNA$Y, pca$x, 0.003 )
+sleepwalk( tsneRNA$Y, pca$x, 0.07 )
 
 # How much difference did it make that we allowed so many PCs? Let's try with only 10
 pca_B <- prcomp_irlba( t(exprsRNA), n=10 )
