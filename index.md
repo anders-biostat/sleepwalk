@@ -73,6 +73,14 @@ of cells not present in the other one.
 
 # Installation
 
+To install `sleepwalk`, start R and type
+
+```r
+install.packages( "devtools" )
+devtools::install_github( "anders-biostat/JsRCom" )
+devtools::install_github( "anders-biostat/sleepwalk" )
+```
+
 # Tutorial
 
 # Usage
