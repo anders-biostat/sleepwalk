@@ -18,7 +18,23 @@ always mean lots of dissimilarities? Our `sleepwalk` package for **R** statistic
 
 ## Explore an embedding
 
+Bellow, there is an example of visualisation, created by the `sleepwalk` package.
 
+Here, we are looking at single-cell transcriptomics data from the "CiteSeq" paper 
+(Stoeckius et al., *Simultaneous epitope and transcriptome measurement in single cells*, [Nature Methods, 14:865](https://doi.org/10.1038/nmeth.4380), 2017).
+Each point is a cell from a human cord blood sample, normalised gene expression values were used as coordinates, and the 2D embedding was created using 
+[t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding).
+
+Try to move your mouse over the points. At any moment the colour will show you the *real* (e.g. based on the original coordinates) distance from
+the cells, at which your mouse is pointing right now, to all other cells. Therefore, simply by moving the mouse one can explore the structure of 
+the data and decide wether the current representation is good enough.
+
+<div class="aspect-ratio">
+	<iframe src="examples/single_emb.html"></iframe>
+</div>
+
+For instance, we immediately can see that the big upper cluster (lets call it **A**) is not as dense as the big lower one (this one we are going to 
+call **B**)
 
 ## Compare two embeddings
 
@@ -26,6 +42,7 @@ always mean lots of dissimilarities? Our `sleepwalk` package for **R** statistic
 
 # Installation
 
+# Tutorial
+
 # Usage
 
-# Tutorial

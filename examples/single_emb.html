@@ -11,24 +11,10 @@
 <table id="embeddings">
   <tr>
     <td><svg id="chart0"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart1"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart2"></svg></td>
-  </tr>
-  <tr>
-    <td><svg id="chart3"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart4"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart5"></svg></td>
-  </tr>
-  <tr>
-    <td><svg id="chart6"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart7"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart8"></svg></td>
+    <td></td>
+    <td><svg id="chart1" width="5px"></svg></td>
+    <td></td>
+    <td><svg id="chart2"  width="5px"></svg></td>
   </tr>
 </table>
 
@@ -57,7 +43,7 @@ deeprange = function(a) {
 
 <script>
 
-width = 500;
+width = window.innerWidth * 0.45 - 50;
 
 n_charts = 1;
 
@@ -160,7 +146,7 @@ set_up_chart = function() {
       //add points
       d3.select( "#chart" + ch )
 	      .attr( "width", width )
-	      .attr( "height", +width + 75) //75px for the colour legend
+	      .attr( "height", +width + 50) //75px for the colour legend
  	      .selectAll("circle")
 	      .data( embedding[ch].map((el, i) => el.concat(i)) )
 	      .enter().append( "circle" )
