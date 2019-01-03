@@ -81,7 +81,17 @@ devtools::install_github( "anders-biostat/JsRCom" )
 devtools::install_github( "anders-biostat/sleepwalk" )
 ```
 
-# Tutorial
-
 # Usage
+
+`sleepwalk` package has only two functions. `sleepwalk()` generates a single plot as in the first example, `sleepwalkMulti()`
+generates several plots.
+
+Both functions take a list of embeddings as their first argument (each embedding must be an `n_i x 2` matrix, where `n_i` is
+a number of points in the sample `i`). Second argument is the list of features to calculate the real distances (each feature 
+matrix must have points as rows and features as columns). Third required argument is maximal distance for colour scale.
+An optional parameter `pointSize` allows one to change the size of the points. `same` is an optional parameter for 
+`sleepwalkMulti()` and defines whether the samples share the same `objects` (as in the second example with two embeddings compared)
+or the same `features` (as in the third examples, where we compared two samples).
+
+
 
