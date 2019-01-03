@@ -56,6 +56,21 @@ and gives you an easy way to compare two (or more if you want) dimensionality re
 
 ## Compare two sets of samples
 
+You can also use `sleepwalk` to compare not only dimensionality reduction approaches, but also two different samples. Now, as example data we are going
+to use glioma samples from two patients (out of six, presented in the paper) 
+from (Filbin et al., *Developmental and oncogenic programs in H3K27M gliomas dissected by single-cell RNA-seq*, [Science, 360:6386](https://doi.org/10.1126/science.aao4750), 2018).
+Once again, single-cell transcriptomics was used to study each sample, and once again we will use a t-SNE plot to visualise them.
+
+<div class="aspect-ratio">
+	<iframe src="examples/comp_samp.html"></iframe>
+</div>
+
+Now, our goal is to figure out if there are correponding groups of cells in the two samples and what are those groups. And `sleepwalk` can help us here as well. The colour 
+now shows the distance from one cell to all other cells in all the embeddings, allowing us to find the most similar clusters. We can immediately see that the two biggest
+clusters not only correspond to each other in both samples, but also are aranged in a similar manner: Move the mouse along the biggest cluster in one of the plots to see it.
+Small cluster in the bottom of the plot to the right, probably, corresponds to a group of clusters on the other plot. We also can clearly see that each sample has a population
+of cells not present in the other one.
+
 # Installation
 
 # Tutorial
