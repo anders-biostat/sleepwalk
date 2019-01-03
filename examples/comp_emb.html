@@ -1,0 +1,297 @@
+<html>
+  
+<head>
+<title>Sleepwalk</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script type="text/javascript" src="data_single.js"></script>
+<script type="text/javascript" src="uData.js"></script>
+</head>
+
+<body>
+
+<table id="embeddings">
+  <tr>
+    <td><svg id="chart0"></svg></td>
+    <td></td>
+    <td><svg id="chart1" width="5px"></svg></td>
+    <td></td>
+    <td><svg id="chart2"  width="5px"></svg></td>
+  </tr>
+</table>
+
+<script src="d3.v5.min.js"></script>
+<script src="d3-lasso.min.js"></script>
+
+<script>
+deeprange = function(a) {
+   var min = Infinity
+   var max = -Infinity
+   for( var i = 0; i < a.length; i++ ) {
+      var x = a[i]
+      var r
+      if( Array.isArray(x) )
+         r = deeprange( x )
+      else
+         r = [ x, x ]
+      if( r[0] < min )
+         min = r[0]
+      if( r[1] > max )
+         max = r[1]
+   }
+   return [ min, max ]
+}
+</script>
+
+<script>
+
+width = window.innerWidth * 0.45 - 50;
+
+n_charts = 2;
+
+mode = "A";
+
+pointSize = 1.5;
+
+maxdist = [data.maxdist, data.maxdist];
+featureMatrix = [data.featureMatrix, data.featureMatrix];
+embedding = [data.embedding, uData];
+
+var centerCell;
+
+set_up_chart = function() {
+
+  	colourScales = [];
+  	axisScales = [];
+  	embeddingScales = [];
+
+  	//this is to allow independent change in scales even for
+  	//"features" mode. May be changed later.
+   maxdist.length == n_charts ? 
+   	scaleDist = maxdist.slice() :
+   	scaleDist = d3.range(n_charts).map(e => maxdist[0]);
+
+   for( var ch = 0; ch < n_charts; ch++ ) {
+		//define all the scales   	
+   	setColourScale(ch); // distance -> colour
+   	setAxisScale(ch);	// distance -> position of the legend axis
+  		embeddingScales[ch] = d3.scaleLinear()  // embedding coordiantes -> position on the plot
+        .domain( deeprange( (mode == "A" ? embedding[ch] : embedding) ) ) 
+        .range( [ 0, width ] );
+
+	   //define colour gradient for the legend
+	   d3.select("#chart" + ch)
+	    	.append("defs")
+	    		.append("linearGradient")
+	    			.attr("id", "colourLegend")
+	    			.attr("x1", "0%")
+	    			.attr("x2", "100%")
+	    			.attr("y1", "0%")
+	    			.attr("y2", "0%");
+
+	   //group of all legend related elements
+      var legend = d3.select("#chart" + ch)
+      	.append("g")
+      		.attr("class", "legend")
+      		.attr("transform", "translate(15, " + width + ")");
+
+     	//here goes the axis
+     	legend
+	 	   .append("g") 
+ 		   	.attr("class", "axis")
+ 	   		.attr("transform", "translate(0, 20)");
+
+ 	   //this is the colour gradient
+      legend.append("rect")
+      	.attr("width", d3.max([width - 40, 0]))
+      	.attr("height", 10)
+      	.attr("y", 20)
+      	.attr("fill", "url(#colourLegend)");
+
+     	//fill all the legend elements
+      updateColour(ch);
+
+      //and buttons to change the colour scales
+      var buttons = legend.append("g")
+      	.attr("class", "buttons")
+      	.attr("transform", "translate(" + d3.max([width - 70, 0]) + ", 35)")
+      	.selectAll(".button").data(["-", "+"].map(e => [e, ch])) //we'll keep the chart number in the data
+      		.enter()
+      			.append("g")
+      				.attr("class", "button")
+      				.attr("transform", (d, i) => "translate(" + (i * 30) + ", 0)")
+      				.on("click", function(d) {
+      					if(d[0] == "+")
+      						scaleDist[d[1]] *= 2;
+      					if(d[0] == "-")
+      						scaleDist[d[1]] /= 2;
+
+      					setColourScale(d[1]);
+      					setAxisScale(d[1]);
+      					updateColour(d[1]);
+      					window["new_center_cell_" + mode]();
+      				});
+      buttons
+  			.append("rect")
+  				.attr("width", 25) //this is used only once, so keep all the styling here
+  				.attr("height", 15)
+  				.attr("fill", "#aaa")
+  				.style("font-weight", "bold");
+
+  		buttons
+  			.append("text")
+  				.text(d => d[0])
+  				.attr("x", 11)
+  				.attr("y", 11)
+  				.attr("size", 13);
+
+      //add points
+      d3.select( "#chart" + ch )
+	      .attr( "width", width )
+	      .attr( "height", +width + 50) //75px for the colour legend
+ 	      .selectAll("circle")
+	      .data( embedding[ch].map((el, i) => el.concat(i)) )
+	      .enter().append( "circle" )
+	         .attr( "cx", function(d) { return embeddingScales[ch]( d[0] ) } )
+	         .attr( "cy", function(d) { return embeddingScales[ch]( d[1] ) } )
+	         .attr( "r", pointSize )
+            .attr( "class", "point" )
+	         .attr( "stroke", 0 )
+	         .attr( "fill", "gray" );
+
+      on_mouse_over = ( function(ch) {
+         return function( d, i ) { 
+         	centerCell = [ch, i];
+         	window["new_center_cell_" + mode]();
+         }
+      })( ch );
+      d3.select( "#chart" + ch )
+         .selectAll("circle")
+	         .on( "mouseover", on_mouse_over );
+
+      d3.select("#chart" + ch)
+         .call(function(ch) {
+            var lasso = d3.lasso()
+               .items(d3.select("#chart" + ch).selectAll("circle"))
+               .closePathDistance(75)
+               .targetArea(d3.select("#chart" + ch))
+               .on("end", function() {
+                  if(!lasso.selectedItems().empty()) {
+                     var selInds = lasso.selectedItems().data().map(el => el[2]);
+
+                     if(mode == "A")
+                        d3.selectAll(".point")
+                           .filter(d => (selInds.indexOf(d[2]) == -1))
+                              .classed("not_selected", true)
+                     else
+                        lasso.notSelectedItems()
+                           .classed("not_selected", true);
+
+
+                     jrc.sendData("sPoints", selInds.map(el => el + 1));
+                  }
+               })
+               .on("start", function() {
+                  var container;
+                  if(mode == "A")
+                     container = d3.select("#embeddings")
+                  else
+                     container = d3.select("#chart" + ch);
+
+                  container.selectAll(".point")
+                     .classed("not_selected", false);
+               });
+            return lasso;
+         }(ch));
+
+   }
+}
+
+var colourScheme = function(d) {
+	return d3.interpolateCubehelixDefault(d * 0.8);
+}
+
+var setColourScale = function(chart) {
+   colourScales[chart] = d3.scaleSequential(colourScheme)
+   	.domain([0, scaleDist[chart]])
+   	.clamp(true);
+}
+
+var setAxisScale = function(chart) {
+  axisScales[chart] = d3.scaleLinear()
+   	.domain([0, scaleDist[chart]])
+   	.range([0, d3.max([width - 40, 0])])
+   	.nice();
+}
+
+var updateColour = function(chart) {
+	//change legend axis
+	d3.axisTop()
+		.scale(axisScales[chart])
+		(d3.select("#chart" + chart)
+			.select(".legend")
+				.select(".axis").transition(1000));
+
+	//change legend gradient
+	var stops = d3.select("#chart" + chart)
+		.select("defs")
+			.select("#colourLegend")
+				.selectAll("stop")
+					.data(d3.range(6).map(e => e/5));
+	stops.enter()
+		.append("stop")
+		.style("stop-opacity", 1)
+		.merge(stops)
+			.attr("offset", d => d * 100 + "%")
+			.style("stop-color", d => colourScales[chart](d * scaleDist[chart]));
+}
+
+new_center_cell_A = function() {
+   for( ch = 0; ch < n_charts; ch++ ) {
+
+	   var x_sel_cell = featureMatrix[ ch ][ centerCell[1] ]
+	   
+	   var dists = Array( embedding[0].length )
+	   
+	   for( var j = 0; j < dists.length; j++ ) {
+	      var s = 0
+	      for( var i = 0; i < x_sel_cell.length; i++ ) {
+	         var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
+	         s += dd * dd;
+	      }
+	      dists[j] = Math.sqrt(s);
+	   }
+	      d3.select( "#chart" + ch )
+	         .selectAll(".point")
+	         .attr( "fill", function( d, i ) { return colourScales[ch](dists[i]) } )
+	}
+}
+
+new_center_cell_B = function() {
+
+   var x_sel_cell = featureMatrix[centerCell[0]][ centerCell[1] ]
+
+   for( ch = 0; ch < n_charts; ch++ ) {
+
+      var distCols = Array( embedding[ch].length )
+      for( var j = 0; j < distCols.length; j++ ) {
+         var s = 0
+         for( var i = 0; i < x_sel_cell.length; i++ ) {
+            var dd = x_sel_cell[i] - featureMatrix[ch][j][i]
+            s += dd * dd
+         }
+         distCols[j] = colourScales[ch](s)
+      }
+
+      d3.select( "#chart" + ch )
+         .selectAll("circle")
+         .attr( "fill", function( d, i ) { return distCols[i] } )
+
+   }
+}
+
+set_up_chart();
+
+</script>
+</body>
+
+</html>
