@@ -67,8 +67,8 @@ umapres <- umap( pca$x )
 # Now compare these
 sleepwalk( 
   list( tsneRNA$Y, umapres$layout ), 
-  list( pca$x, pca$x ), 
-  c( 0.07, 0.07 ) )
+  pca$x, 
+  0.07 )
 
 # Does one actually need to normalize?
 pca_U <- prcomp_irlba( t(log2(countsRNA+1)), n=10 )
@@ -104,7 +104,7 @@ tsne_G2 <- Rtsne( pca$x[cellGroup2,], pca=FALSE, verbose=TRUE )
 sleepwalk( 
   list( tsneRNA$Y, tsne_G1$Y, tsne_G2$Y ), 
   list( pca$x, pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
-  .003,
+  c(.003, .003, 0.01),
   same="features")
 
 # now the sleepwalk with dual 

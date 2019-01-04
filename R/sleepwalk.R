@@ -1,3 +1,11 @@
+`%||%` <- function(x, y) {
+  if(is.null(x)) {
+    y
+  } else {
+    x
+  }
+}
+
 #' @export
 sleepwalk <- function( embeddings, featureMatrices, maxdists, pointSize = 1.5, same = c( "objects", "features" ) ) {
   same = match.arg( same )
@@ -5,29 +13,35 @@ sleepwalk <- function( embeddings, featureMatrices, maxdists, pointSize = 1.5, s
   #if there is only one embedding
   if(!is.null(dim(embeddings))) 
     embeddings <- list(embeddings)
-
   if(!is.null(dim(featureMatrices)))
     featureMatrices <- list(featureMatrices)    
 
+  stopifnot( is.list(embeddings) )
+  stopifnot( is.list(featureMatrices) )
+  
   stopifnot( is.numeric(maxdists) )
   stopifnot( is.numeric(pointSize) && length(pointSize) == 1 )
     
   stopifnot( length(embeddings) <= 9 )
-  stopifnot( length(embeddings) == length(featureMatrices) )
   
-  if( same == "objects" ) 
-     stopifnot( length(maxdists) == length(featureMatrices) )
-  else
-     stopifnot( length(maxdists) == 1 )
+  if( same == "objects" ) {
+    stopifnot( length(embeddings) == length(featureMatrices) | length(featureMatrices) == 1 )
+    stopifnot( length(maxdists) == length(featureMatrices) )
+  }
+  else {
+    stopifnot( length(embeddings) == length(featureMatrices) )
+    stopifnot( length(maxdists) == length(featureMatrices) | length(maxdists) == 1 )
+  }
   
-  stopifnot( is.list(embeddings) )
-  stopifnot( is.list(featureMatrices) )
+  oneFM <- NULL
+  if(length(embeddings) != length(featureMatrices))
+    oneFM <- 1
   
   for( i in 1:length(embeddings) ) {
      stopifnot( length( dim( embeddings[[i]] ) ) == 2 )
-     stopifnot( length( dim( featureMatrices[[i]] ) ) == 2 )
+     stopifnot( length( dim( featureMatrices[[oneFM %||% i]] ) ) == 2 )
      stopifnot( ncol( embeddings[[i]] ) == 2 )
-     stopifnot( nrow( embeddings[[i]] ) == nrow( featureMatrices[[i]] ) )
+     stopifnot( nrow( embeddings[[i]] ) == nrow( featureMatrices[[oneFM %||% i]] ) )
      if( same == "objects" ) 
         stopifnot( nrow( embeddings[[i]] ) == nrow( embeddings[[1]] ) )
      else

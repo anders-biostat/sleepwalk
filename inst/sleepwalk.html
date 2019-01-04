@@ -60,6 +60,8 @@ width = 500;
 
 n_charts = 2;
 
+//"A" - same objects
+//"B" - same features
 mode = "A";
 
 pointSize = 1.5;
@@ -77,6 +79,10 @@ set_up_chart = function() {
    maxdist.length == n_charts ? 
    	scaleDist = maxdist.slice() :
    	scaleDist = d3.range(n_charts).map(e => maxdist[0]);
+
+   if( embedding.length != featureMatrix.length )
+      for(var i = 1; i < embedding.length; i++ )
+         featureMatrix[i] = featureMatrix[0];
 
    for( var ch = 0; ch < n_charts; ch++ ) {
 		//define all the scales   	
