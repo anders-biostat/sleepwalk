@@ -56,43 +56,43 @@ pca_B <- prcomp_irlba( t(exprsRNA), n=10 )
 tsneRNA_B <- Rtsne( pca_B$x, pca=FALSE, verbose=TRUE )
 
 # And compare side by side
-sleepwalkMulti( 
+sleepwalk( 
   list( tsneRNA$Y, tsneRNA_B$Y ), 
   list( pca$x, pca_B$x ), 
-  c( 0.003, 0.003 ) )
+  c( 0.07, 0.07 ) )
 
 # How about UMAP?
 umapres <- umap( pca$x )
 
 # Now compare these
-sleepwalkMulti( 
+sleepwalk( 
   list( tsneRNA$Y, umapres$layout ), 
   list( pca$x, pca$x ), 
-  c( 0.002, 0.002 ) )
+  c( 0.07, 0.07 ) )
 
 # Does one actually need to normalize?
 pca_U <- prcomp_irlba( t(log2(countsRNA+1)), n=10 )
 tsneRNA_U <- Rtsne( pca_U$x, pca=FALSE, verbose=TRUE )
 
-sleepwalkMulti( 
+sleepwalk( 
   list( tsneRNA_B$Y, tsneRNA_U$Y ), 
   list( pca_B$x, pca_U$x ), 
-  c( 0.001, 20 ) )
+  c( 0.04, 10 ) )
 
 
 # We still have the ADT data
 tsneADT <- Rtsne( t( log10( 1 + countsADT ) ), pca=FALSE, verbose=TRUE )
 
-sleepwalkMulti( 
+sleepwalk( 
   list( tsneRNA$Y, tsneADT$Y ), 
   list( pca$x, t( log10( 1 + countsADT ) ) ), 
-  c( 0.003, 3 ) )
+  c( 0.07, 2 ) )
 
 
 # To demonstrate the other multi view mode, let's divide up the RNA data
 cellGroup1 <- sample( colnames(countsRNA), ncol(countsRNA)/3 )
 cellGroup2 <- setdiff( colnames(countsRNA), cellGroup1 )
-sleepwalkMulti( 
+sleepwalk( 
   list( tsneRNA$Y[cellGroup1,], tsneRNA$Y[cellGroup2,] ), 
   list( pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
   .002,
@@ -101,10 +101,10 @@ sleepwalkMulti(
 tsne_G1 <- Rtsne( pca$x[cellGroup1,], pca=FALSE, verbose=TRUE )
 tsne_G2 <- Rtsne( pca$x[cellGroup2,], pca=FALSE, verbose=TRUE )
 
-sleepwalkMulti( 
+sleepwalk( 
   list( tsneRNA$Y, tsne_G1$Y, tsne_G2$Y ), 
   list( pca$x, pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
-  .002,
+  .003,
   same="features")
 
 # now the sleepwalk with dual 

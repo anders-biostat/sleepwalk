@@ -1,26 +1,27 @@
-sleepwalk <- function( embedding, featureMatrix, maxdist, pointSize = 1.5 ) {
-  stopifnot( length( dim( embedding ) ) == 2 )
-  stopifnot( length( dim( featureMatrix ) ) == 2 )
-  stopifnot( ncol( embedding ) == 2 )
-  stopifnot( nrow( embedding ) == nrow( featureMatrix ) )
-  stopifnot( is.numeric( maxdist ) && length( maxdist ) == 1 )
-  stopifnot( is.numeric(pointSize) && length(pointSize) == 1 )
-
-  sleepwalkMulti( list( embedding ), list( featureMatrix ), maxdist, pointSize = pointSize )
-}
-
-sleepwalkMulti <- function( embeddings, featureMatrices, maxdists, pointSize = 1.5, same = c( "objects", "features" ) ) {
+#' @export
+sleepwalk <- function( embeddings, featureMatrices, maxdists, pointSize = 1.5, same = c( "objects", "features" ) ) {
   same = match.arg( same )
   
+  #if there is only one embedding
+  if(!is.null(dim(embeddings))) 
+    embeddings <- list(embeddings)
+
+  if(!is.null(dim(featureMatrices)))
+    featureMatrices <- list(featureMatrices)    
+
+  stopifnot( is.numeric(maxdists) )
+  stopifnot( is.numeric(pointSize) && length(pointSize) == 1 )
+    
   stopifnot( length(embeddings) <= 9 )
   stopifnot( length(embeddings) == length(featureMatrices) )
+  
   if( same == "objects" ) 
      stopifnot( length(maxdists) == length(featureMatrices) )
   else
      stopifnot( length(maxdists) == 1 )
+  
   stopifnot( is.list(embeddings) )
   stopifnot( is.list(featureMatrices) )
-  stopifnot( is.numeric(pointSize) && length(pointSize) == 1 )
   
   for( i in 1:length(embeddings) ) {
      stopifnot( length( dim( embeddings[[i]] ) ) == 2 )
