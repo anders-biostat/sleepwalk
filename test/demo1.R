@@ -76,8 +76,7 @@ tsneRNA_U <- Rtsne( pca_U$x, pca=FALSE, verbose=TRUE )
 
 sleepwalk( 
   list( tsneRNA_B$Y, tsneRNA_U$Y ), 
-  list( pca_B$x, pca_U$x ), 
-  c( 0.04, 10 ) )
+  list( pca_B$x, pca_U$x ) )
 
 
 # We still have the ADT data
@@ -88,6 +87,18 @@ sleepwalk(
   list( pca$x, t( log10( 1 + countsADT ) ) ), 
   c( 0.07, 2 ) )
 
+# It is possible to use distances instead of features 
+# Let's look at genes instead of cells
+means <- apply( exprsRNA, 1, mean )
+vars <- apply( exprsRNA, 1, var )
+plot( means, vars/means, pch=".", log="xy" )
+abline( h=1e-3 )
+goodGenes <- names( which( vars/means > 1e-3 ) )
+
+distGenes <- acos( cor( t(exprsRNA[ goodGenes, ]), method="spearman") ) / pi
+tsneDual <- Rtsne( distGenes, is_distance = TRUE )
+
+sleepwalk( tsneDual$Y, distances = distGenes, maxdists = 0.7, pointSize = 3)
 
 # To demonstrate the other multi view mode, let's divide up the RNA data
 cellGroup1 <- sample( colnames(countsRNA), ncol(countsRNA)/3 )

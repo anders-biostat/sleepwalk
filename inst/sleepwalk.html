@@ -66,6 +66,9 @@ mode = "A";
 
 pointSize = 1.5;
 
+featureMatrix = undefined;
+distance = undefined;
+
 var centerCell;
 
 set_up_chart = function() {
@@ -80,9 +83,13 @@ set_up_chart = function() {
    	scaleDist = maxdist.slice() :
    	scaleDist = d3.range(n_charts).map(e => maxdist[0]);
 
-   if( embedding.length != featureMatrix.length )
+   if( featureMatrix && embedding.length != featureMatrix.length )
       for(var i = 1; i < embedding.length; i++ )
          featureMatrix[i] = featureMatrix[0];
+
+   if( distance && embedding.length != distance.length )
+      for(var i = 1; i < embedding.length; i++ )
+         distance[i] = distance[0];
 
    for( var ch = 0; ch < n_charts; ch++ ) {
 		//define all the scales   	
@@ -262,27 +269,30 @@ var updateColour = function(chart) {
 new_center_cell_A = function() {
    for( ch = 0; ch < n_charts; ch++ ) {
 
-	   var x_sel_cell = featureMatrix[ ch ][ centerCell[1] ]
-	   
-	   var dists = Array( embedding[0].length )
-	   
-	   for( var j = 0; j < dists.length; j++ ) {
-	      var s = 0
-	      for( var i = 0; i < x_sel_cell.length; i++ ) {
-	         var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
-	         s += dd * dd;
-	      }
-	      dists[j] = Math.sqrt(s);
-	   }
-	      d3.select( "#chart" + ch )
-	         .selectAll(".point")
-	         .attr( "fill", function( d, i ) { return colourScales[ch](dists[i]) } )
+	   if(featureMatrix) {
+         var x_sel_cell = featureMatrix[ ch ][ centerCell[1] ],
+            dists = Array( embedding[0].length );
+      
+         for( var j = 0; j < dists.length; j++ ) {
+            var s = 0
+            for( var i = 0; i < x_sel_cell.length; i++ ) {
+               var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
+               s += dd * dd;
+            }
+            dists[j] = Math.sqrt(s);
+         }
+      } else 
+         var dists = distance[ch][centerCell[1]];
+
+	   d3.select( "#chart" + ch )
+	      .selectAll(".point")
+	      .attr( "fill", function( d, i ) { return colourScales[ch](dists[i]) } )
 	}
 }
 
 new_center_cell_B = function() {
 
-   var x_sel_cell = featureMatrix[centerCell[0]][ centerCell[1] ]
+   var x_sel_cell = featureMatrix[centerCell[0]][ centerCell[1] ];
 
    for( ch = 0; ch < n_charts; ch++ ) {
 
