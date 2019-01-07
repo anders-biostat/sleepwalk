@@ -91,11 +91,11 @@ sleepwalk(
 # Let's look at genes instead of cells
 means <- apply( exprsRNA, 1, mean )
 vars <- apply( exprsRNA, 1, var )
-plot( means, vars/means, pch=".", log="xy" )
-abline( h=1e-3 )
+plot( means, vars/means, pch = ".", log = "xy" )
+abline( h = 1e-3 )
 goodGenes <- names( which( vars/means > 1e-3 ) )
 
-distGenes <- acos( cor( t(exprsRNA[ goodGenes, ]), method="spearman") ) / pi
+distGenes <- acos( cor( t(exprsRNA[ goodGenes, ]), method = "spearman") ) / pi
 tsneDual <- Rtsne( distGenes, is_distance = TRUE )
 
 sleepwalk( tsneDual$Y, distances = distGenes, maxdists = 0.7, pointSize = 3)
@@ -107,16 +107,16 @@ sleepwalk(
   list( tsneRNA$Y[cellGroup1,], tsneRNA$Y[cellGroup2,] ), 
   list( pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
   .002,
-  same="features" )
+  same = "features" )
 
-tsne_G1 <- Rtsne( pca$x[cellGroup1,], pca=FALSE, verbose=TRUE )
-tsne_G2 <- Rtsne( pca$x[cellGroup2,], pca=FALSE, verbose=TRUE )
+tsne_G1 <- Rtsne( pca$x[cellGroup1,], pca = FALSE, verbose=TRUE )
+tsne_G2 <- Rtsne( pca$x[cellGroup2,], pca = FALSE, verbose=TRUE )
 
 sleepwalk( 
   list( tsneRNA$Y, tsne_G1$Y, tsne_G2$Y ), 
   list( pca$x, pca$x[cellGroup1,], pca$x[cellGroup2,] ), 
   c(.003, .003, 0.01),
-  same="features")
+  same = "features")
 
 # now the sleepwalk with dual 
 means <- apply( exprsRNA, 1, mean )

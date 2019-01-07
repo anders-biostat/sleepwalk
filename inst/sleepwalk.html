@@ -2,7 +2,31 @@
   
 <head>
 <title>Sleepwalk</title>
-<link rel="stylesheet" type="text/css" href="style.css">
+<style>
+   .lasso path {
+       stroke: rgb(80,80,80);
+       stroke-width:2px;
+   }
+
+   .lasso .drawn {
+       fill-opacity:.05 ;
+   }
+
+   .lasso .loop_close {
+       fill:none;
+       stroke-dasharray: 4,4;
+   }
+
+   .lasso .origin {
+       fill:#3399FF;
+       fill-opacity:.5;
+   }
+
+   .not_selected {
+       fill: #aaa;
+       opacity: 0.5;
+   }   
+</style>
 </head>
 
 <body>
@@ -315,5 +339,4 @@ new_center_cell_B = function() {
 
 </script>
 </body>
-
 </html>

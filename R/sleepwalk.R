@@ -6,9 +6,10 @@
   }
 }
 
+#' @importFrom jsonlite toJSON
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, 
-                       distances = NULL, same = c( "objects", "features" ) ) {
+                       distances = NULL, same = c( "objects", "features" ), saveToFile = NULL ) {
   same = match.arg( same )
   
   if(is.null(featureMatrices)) {
@@ -80,20 +81,48 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     stopifnot( length(maxdists) == length(featureMatrices) | length(maxdists) == 1 )
   }
   
-  JsRCom::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk.html" )
-  if( same == "objects" ) 
-     JsRCom::sendData( "mode", "A" )
-  else
-     JsRCom::sendData( "mode", "B" )
-  
-  JsRCom::sendData( "n_charts", length(embeddings) )
-  JsRCom::sendData( "maxdist", maxdists, TRUE )
-  JsRCom::sendData( "embedding", embeddings, TRUE )
-  if(!is.null(featureMatrices)) {
-    JsRCom::sendData( "featureMatrix", featureMatrices, TRUE )
+  if(is.null(saveToFile)) {
+    JsRCom::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk.html" )
+    
+    if( same == "objects" ) 
+      JsRCom::sendData( "mode", "A" )
+    else
+      JsRCom::sendData( "mode", "B" )
+    
+    JsRCom::sendData( "n_charts", length(embeddings) )
+    JsRCom::sendData( "maxdist", maxdists, TRUE )
+    JsRCom::sendData( "embedding", embeddings, TRUE )
+    if(!is.null(featureMatrices)) {
+      JsRCom::sendData( "featureMatrix", featureMatrices, TRUE )
+    } else {
+      JsRCom::sendData( "distance", distances, TRUE )
+    }
+    JsRCom::sendData( "pointSize", pointSize )
+    JsRCom::sendCommand( "set_up_chart()" )
   } else {
-    JsRCom::sendData( "distance", distances, TRUE )
+    content <- readLines(paste0(system.file( package="sleepwalk" ), "/", "sleepwalk.html"), warn = F)
+    
+    while(sum(grepl("script src", content)) != 0) {
+      i <- which(grepl("script src", content))[1]
+      fName <- gsub("<script src=\"(.*?)\"></script>", "\\1", content[i])
+      script <- readLines(paste0(system.file( package="sleepwalk" ), "/", fName), warn = F)
+      content <- c(content[1:(i - 1)], "<script>", script, "</script>", content[(i + 1):length(content)])
+    }
+    
+    newLines <- c(
+      paste0("mode = ", ifelse(same == "objects", "'A'", "'B'"), ";"),
+      paste0("n_charts = ", length(embeddings), ";"),
+      paste0("maxdist = ", toJSON(maxdists), ";"),
+      paste0("embedding = ", toJSON(embeddings), ";"),
+      ifelse(!is.null(featureMatrices), 
+        paste0("featureMatrix = ", toJSON(featureMatrices), ";"),
+        paste0("distance = ", toJSON(distances), ";")),
+      paste0("pointSize = ", pointSize, ";"),
+      "set_up_chart();"
+    )
+    
+    content <- c(content[1:(length(content) - 3)], newLines, "</script>", "</body>", "</html>")
+    
+    writeLines(content, saveToFile)
   }
-  JsRCom::sendData( "pointSize", pointSize )
-  JsRCom::sendCommand( "set_up_chart()" )
 }
