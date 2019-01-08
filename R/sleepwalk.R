@@ -78,8 +78,6 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   
   stopifnot( is.list(featureMatrices %||% distances) )
 
-  stopifnot( length(embeddings) <= 9 )
-
   if( same == "objects" ) {
     stopifnot( length(embeddings) == length(featureMatrices %||% distances) | 
                  length(featureMatrices %||% distances) == 1 )

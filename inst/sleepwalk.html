@@ -32,27 +32,6 @@
 <body>
 
 <table id="embeddings">
-  <tr>
-    <td><svg id="chart0"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart1"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart2"></svg></td>
-  </tr>
-  <tr>
-    <td><svg id="chart3"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart4"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart5"></svg></td>
-  </tr>
-  <tr>
-    <td><svg id="chart6"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart7"></svg></td>
-    <td width="60px"></td>
-    <td><svg id="chart8"></svg></td>
-  </tr>
 </table>
 
 <script src="d3.v5.min.js"></script>
@@ -96,6 +75,8 @@ distance = undefined;
 var centerCell;
 
 set_up_chart = function() {
+
+   addSVGs(n_charts);
 
   	colourScales = [];
   	axisScales = [];
@@ -335,6 +316,24 @@ new_center_cell_B = function() {
          .attr( "fill", function( d, i ) { return distCols[i] } )
 
    }
+}
+
+addSVGs = function(n) {
+   var ncol = Math.ceil(Math.sqrt(n)),
+      nrow = Math.ceil(n / ncol);
+   d3.select("#embeddings")
+      .selectAll("tr")
+         .data(d3.range(nrow))
+         .enter()
+            .append("tr");
+   d3.select("#embeddings")
+      .selectAll("tr")
+         .selectAll("td")
+         .data(d => d3.range(ncol).map(e => [d, e]))
+            .enter()
+               .append("td")
+                  .append("svg")
+                     .attr("id", d => "chart" + (d[0] * nrow + d[1]));
 }
 
 </script>
