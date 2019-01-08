@@ -212,8 +212,11 @@ set_up_chart = function() {
                         lasso.notSelectedItems()
                            .classed("not_selected", true);
 
-
-                     jrc.sendData("sPoints", selInds.map(el => el + 1));
+                     if(jrc) {
+                        jrc.sendData("selPoints", selInds.map(el => el + 1));
+                        jrc.sendCommand("slw_on_selection(selPoints, " + (+ch + 1) +")");
+                     }
+                     
                   }
                })
                .on("start", function() {

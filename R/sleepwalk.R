@@ -6,7 +6,7 @@
   }
 }
 
-#' Interactively explore one or several 2D embeddings
+#' @title Interactively explore one or several 2D embeddings
 #' 
 #' A function to interactively explore a 2D embedding of some higher-dimensional
 #' point cloud, as produced by a dimension reduction method such as MDS, t-SNE, or the like.
@@ -167,4 +167,21 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     
     writeLines(content, saveToFile)
   }
+}
+
+#' On selection
+#' 
+#' This function is called each time any points are selected or deselected.
+#' You can customise it by redefining.
+#' 
+#' @param points a vector of indices of the selected points.
+#' @param emb an index of the embedding, where the points have been selected.
+#' 
+#' @export
+slw_on_selection <- function(points, emb) {
+  message(paste0("You've selected ", length(points), " points from the embedding ", emb, "."))
+  message(paste0("The indices of the selected points are now stored in the variable 'selPoints'."))
+  message(paste0("You can also redefine this function 'slw_on_selection' that is called each time any points are selected."))
+  message(paste0("It's first argument is a vector of indices of all the selected points, and the second one is the index of ",
+                 "the embedding, where they were selected."))
 }
