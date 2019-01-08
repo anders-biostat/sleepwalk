@@ -6,6 +6,50 @@
   }
 }
 
+#' Interactively explore one or several 2D embeddings
+#' 
+#' A function to interactively explore a 2D embedding of some higher-dimensional
+#' point cloud, as produced by a dimension reduction method such as MDS, t-SNE, or the like.
+#' 
+#' @param embeddings either an \eqn{n x 2} embedding matrix (where \eqn{n} is a number of points) or
+#' a list of \eqn{n_i x 2} matices - one for each embedding. If \code{same = "objects"} all embedding
+#' matrices must have the same number of rows.
+#' @param featureMatrices either an \eqn{n x m} matrix of points coordinates in the feature-dimension
+#' space or a list of such matrices - one for each embedding. The displayed distances will be calculated 
+#' as Euclidean distances of the rows of these matrices. Alternatively, if \code{same = "objects"}
+#' it is possible to provide the distances directly via the \code{distances} argument. 
+#' If \code{same = "features"} then all the points must be from the same feature space and therefore
+#' have the same number of columns. It is possible to use one feature matrix for all the embeddings.
+#' @param maxdists a vector of the maximum distances (in feature space) for each provided feature or
+#' distance matrix that should still be covered by the colour 
+#' scale; higher distances are shown in light gray. This values can be changed later interactively.
+#' If not provided, maximum distances will be estimated automatically as median value of the 
+#' distances.
+#' @param pointSize size of the points on the plots.
+#' @param distances distances (in feature spase) between points that should be displayed as colours.
+#' This is an alternative to \code{featureMatrices} if \code{same = "objects"}.
+#' @param same defines what kind of distances to show; must be one of \code{"objects", "features"}.
+#' \code{same = "objects"} is used when all the embeddings show the same set of points. In this case,
+#' the distance from the selected point on each of embedding to all other points of the same embedding
+#' is shown. The same or different feature of distance matrix can be used for that. \code{same = "features"}
+#' is used to compare different sets of points (e.g. samples from different patients, or different batches) 
+#' in the same feature space. In this case the distance is calculated from the selected point to all other 
+#' points (including those in other embeddings).
+#' @param saveToFile path to the .html file where to save the plots. The resulting page will be fully interactive
+#' and contain all the data. If this is \code{NULL}, than the plots will be shown as the web page in your 
+#' default browser. Note, that if you try to save that page, using your browser's functionality,
+#' it'll become static.
+#' 
+#' The function opens a browser window and displays the embeddings as point clouds. When the user
+#' moves the mouse over a point, all data points change colour such that their colour indicates
+#' the feature-space distance to the point under the mouse cursor. This allows to quickly and
+#' intuitively check how tight clusters are, how faithful the embedding is, and how similar
+#' the clusters are.
+#' 
+#' @return None.
+#' 
+#' @author Simon Anders
+#' 
 #' @importFrom jsonlite toJSON
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, 
