@@ -110,6 +110,6 @@ Finally, instead of opening the app in a browser, you can ask to **save everythi
 
 # Authors
 
-Sleepwalk is beeing developed by [Svetlana Ovchinnikova](mailto:s.ovchinnikova@zmbh.uni-heidelberg.de) and [Simon Anders](mailto:s.anders@zmbh.uni-heidelberg.de) at the [Center for Molecular Biology of the University of Heidelberg](https://www.zmbh.uni-heidelberg.de/anders). Please contact us for questions or feedback.
+Sleepwalk is beeing developed by [Svetlana Ovchinnikova](mailto:s.ovchinnikova@zmbh.uni-heidelberg.de) and [Simon Anders](mailto:s.anders@zmbh.uni-heidelberg.de) at the [Center for Molecular Biology of the University of Heidelberg](https://www.zmbh.uni-heidelberg.de/anders). Please contact us for questions or feedback, or file an [issue](https://github.com/anders-biostat/sleepwalk/issues) on GitHub if you find a bug.
 
 
