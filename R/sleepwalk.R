@@ -48,7 +48,7 @@
 #' 
 #' @return None.
 #' 
-#' @author Simon Anders
+#' @author Simon Anders, Svetlana Ovchinnikova
 #' 
 #' @importFrom jsonlite toJSON
 #' @export
