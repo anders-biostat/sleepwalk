@@ -95,6 +95,12 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     stopifnot( length( dim( (featureMatrices %||% distances)[[oneFM %||% i]] ) ) == 2 )
     stopifnot( ncol( embeddings[[i]] ) == 2 )
     stopifnot( nrow( embeddings[[i]] ) == nrow( (featureMatrices %||% distances)[[oneFM %||% i]] ) )
+    embeddings[[i]] <- as.matrix(embeddings[[i]])
+    if(!is.null(featureMatrices)) {
+      featureMatrices[[oneFM %||% i]] <- as.matrix(featureMatrices[[oneFM %||% i]])
+    } else {
+      distances[[oneFM %||% i]] <- as.matrix(distances[[oneFM %||% i]])
+    }
     if( same == "objects" ) 
       stopifnot( nrow( embeddings[[i]] ) == nrow( embeddings[[1]] ) )
     else
