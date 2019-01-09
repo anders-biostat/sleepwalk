@@ -4,3 +4,5 @@ Gemfile
 Gemfile\.lock
 
 _site/
+
+R/\.Rhistory

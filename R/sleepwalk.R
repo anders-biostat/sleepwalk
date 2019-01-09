@@ -6,7 +6,7 @@
   }
 }
 
-#' @title Interactively explore one or several 2D embeddings
+#' Interactively explore one or several 2D embeddings
 #' 
 #' A function to interactively explore a 2D embedding of some higher-dimensional
 #' point cloud, as produced by a dimension reduction method such as MDS, t-SNE, or the like.

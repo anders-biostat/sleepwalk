@@ -2,10 +2,7 @@
 % Please edit documentation in R/sleepwalk.R
 \name{sleepwalk}
 \alias{sleepwalk}
-\title{Interactively explore one or several 2D embeddings
-
-A function to interactively explore a 2D embedding of some higher-dimensional
-point cloud, as produced by a dimension reduction method such as MDS, t-SNE, or the like.}
+\title{Interactively explore one or several 2D embeddings}
 \usage{
 sleepwalk(embeddings, featureMatrices = NULL, maxdists = NULL,
   pointSize = 1.5, distances = NULL, same = c("objects", "features"),
@@ -57,8 +54,6 @@ the clusters are.}
 None.
 }
 \description{
-Interactively explore one or several 2D embeddings
-
 A function to interactively explore a 2D embedding of some higher-dimensional
 point cloud, as produced by a dimension reduction method such as MDS, t-SNE, or the like.
 }
