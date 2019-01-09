@@ -35,7 +35,7 @@ Each point is a cell from a human cord blood sample. Normalised gene expression 
 	<iframe src="examples/single_emb.html"></iframe>
 </div>
 
-**Move your mouse over the points.** At any moment the colours will show you the *real* (e.g. based on the original, feature-space coordinates) distance of all the cells to the one cell right under your mouse cursor. Thus, simply by moving the mouse you can explore the structure of the data and see whether the embedding gives a faithful representation and where it is distorted.
+**Move your mouse over the points.** At any moment the colours will show you the *real* (i.e., based on the original data, before the dimension reduction) distances of all the cells to the one cell right under your mouse cursor. (By default, Euclidean feature-space distances are used as the "real" distances.) Thus, simply by moving the mouse you can explore the structure of the data and see whether the embedding gives a faithful representation and where it is distorted.
 
 For instance, we immediately can see that the big upper cluster (let's call it *A*) is not as 
 dense as the big lower one (this one we are going to call *B*).
@@ -89,19 +89,23 @@ devtools::install_github( "anders-biostat/sleepwalk" )
 
 # Usage
 
-The `sleepwalk` package is easy to use. It has only two functions: `sleepwalk()` generates a single plot as in the first example, `sleepwalkMulti()` generates several plots as in the later examples.
+The `sleepwalk` package is easy to use. It has only one function, also called `sleepwalk()`.
 
-Both functions take the following arguments
+As its first argument (`embeddings`), `sleepwalk` expects an embedding, i.e., a *n* x 2 matrix of 2D coordinates for the *n* points. To get multiple plot (as in the second and third example above), pass a list with several such matrices, one for each of the plots.
 
-- First, pass the embedding, i.e., a *n* x 2 matrix of 2D coordinates for the *n* points. For `sleepwalkMulti`, pass a list with several such matrices, one for each of the plots.
+As second argument (`featureMatrices`), pass the feature matrix: this is the *n* x *m* matrix with one row for each of the *n* points (e.g., cells) and one columns for each of the *m* features (e.g., genes) that should be used to calculate the actual distances. Sleepwalk determines the colour of each point from the Euclidean distance between the row of the point to be coloured and the row of the point under the mouse cursor. For multiple plots, pass a list of several such matrices, one for each plot. 
 
-- As second argument, pass the feature matrix: this is the *n* x *m* matrix with one row for each of the *n* points (e.g., cells) and one columns for each of the *m* features (e.g., genes) that should be used to calculate the actual distances. Sleepwalk determines the colour of each point from the Euclidean distance between the row of the point to be coloured and the row of the point under the mouse cursor. For `sleepwalkMulti`, pass a list of several such matrices, one for each plot. If *m* is large, it can be a good idea to only pass the first 30 or so principal components of the sample. Use the `prcomp_irlba` function from the [`irlba` package](https://bwlewis.github.io/irlba/), to efficiently calculate them.
+If *m* is large, it can be a good idea to only pass the first 30 or so principal components of the sample. Use the `prcomp_irlba` function from the [`irlba` package](https://bwlewis.github.io/irlba/), to efficiently calculate them.
 
-- The third argument is the maximum value for the colour scale. You can adjust this afterwards with the "+" and "-" buttons next to the colour scale. For `sleepwalkMulti`, pass a vector, with one value for each plot.
+Instead of passing the *n* x *m* feature matrix, you can use the positional argument `distances` and pass a square *n* x *n* distance matrix, giving the distances between all pairs of points that should be used to determine the point colours. Use this if you think that simple Euclidean distances are not appropriate for your data and you have something more suitable.
 
-- The optional parameter `pointsize` allwos you to change the size of the points.
+You also have to specify `maxdists`: the maximum value for the colour scale. You can adjust this afterwards with the "+" and "-" buttons next to the colour scale. For mutiple plots, you can pass a vector, with one value for each plot.
 
-- `same` is an optional parameter, only for `sleepwalkMulti`. It specifies whether the samples share the same objects (`same="objects"`), as in the second example with two embeddings compared, or the same features (`same="features"`), as in the third examples, where we compared two samples). The default is `same="objects"`. Note that for same `same="objects"`, all the matrices in the first and second argument must have the same number of rows. For `same="features"`, the feature matrices in the second argument must have the same number of columns.
+If you ask for mroe than one plot, you can specify, with the parameter `same`, whether the plots share the same objects (`same="objects"`), as above in the second example with two embeddings compared, or the same features (`same="features"`), as in the third examples, where we compared two samples. The default is `same="objects"`. Note that for same `same="objects"`, all the matrices in the first and second argument must have the same number of rows. For `same="features"`, the feature matrices in the second argument must have the same number of columns.
+
+The optional parameter `pointsize` allwos you to change the size of the points.
+
+Finally, instead of opening the app in a browser, you can ask to **save everything to an HTML file**, by passing a file name in the optional `saveToFile` parameter. This file will then contaiin all your data and the sleepwalk app code (in JavaScript), so that you can view it in any web browser without needing to have an R session running. This can be useful to share your sleepwalk visualization with colleagues unfamiliar with R or to provide your embedding as an interactive supplement in a publication.
 
 
 # Authors
