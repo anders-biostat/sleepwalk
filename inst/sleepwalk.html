@@ -72,7 +72,7 @@ pointSize = 1.5;
 featureMatrix = undefined;
 distance = undefined;
 
-var centerCell;
+var centerCell, xDomain, yDomain;
 
 set_up_chart = function() {
 
@@ -100,9 +100,7 @@ set_up_chart = function() {
 		//define all the scales   	
    	setColourScale(ch); // distance -> colour
    	setAxisScale(ch);	// distance -> position of the legend axis
-  		embeddingScales[ch] = d3.scaleLinear()  // embedding coordiantes -> position on the plot
-        .domain( deeprange( (mode == "A" ? embedding[ch] : embedding) ) ) 
-        .range( [ 0, width ] );
+    setEmbeddingScales(ch); //embedding coordinates -> position on the plot
 
 	   //define colour gradient for the legend
 	   d3.select("#chart" + ch)
@@ -177,8 +175,8 @@ set_up_chart = function() {
  	      .selectAll("circle")
 	      .data( embedding[ch].map((el, i) => el.concat(i)) )
 	      .enter().append( "circle" )
-	         .attr( "cx", function(d) { return embeddingScales[ch]( d[0] ) } )
-	         .attr( "cy", function(d) { return embeddingScales[ch]( d[1] ) } )
+	         .attr( "cx", function(d) { return embeddingScales[ch].x( d[0] ) } )
+	         .attr( "cy", function(d) { return embeddingScales[ch].y( d[1] ) } )
 	         .attr( "r", pointSize )
             .attr( "class", "point" )
 	         .attr( "stroke", 0 )
@@ -240,7 +238,7 @@ var colourScheme = function(d) {
 }
 
 var setColourScale = function(chart) {
-   colourScales[chart] = d3.scaleSequential(colourScheme)
+  colourScales[chart] = d3.scaleSequential(colourScheme)
    	.domain([0, scaleDist[chart]])
    	.clamp(true);
 }
@@ -250,6 +248,28 @@ var setAxisScale = function(chart) {
    	.domain([0, scaleDist[chart]])
    	.range([0, d3.max([width - 40, 0])])
    	.nice();
+}
+
+var setEmbeddingScales = function(chart) {
+  if(mode == "A") {
+    xDomain = d3.extent(embedding[chart].map(e => e[0]));
+    yDomain = d3.extent(embedding[chart].map(e => e[1]));
+  }
+
+  if(mode == "B" && xDomain == undefined) {
+    xDomain = d3.extent([].concat.apply([], embedding).map(e => e[0]));
+    yDomain = d3.extent([].concat.apply([], embedding).map(e => e[1]));
+  }
+
+  embeddingScales[chart] = {
+    x: d3.scaleLinear()
+        .domain(xDomain)
+        .range([0, width]),
+    y: d3.scaleLinear()
+        .domain(yDomain)
+        .range([width, 0])
+  }
+
 }
 
 var updateColour = function(chart) {

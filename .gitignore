@@ -6,3 +6,5 @@ Gemfile\.lock
 _site/
 
 R/\.Rhistory
+
+test/\.Rhistory
