@@ -29,24 +29,30 @@ Below is an example of a t-SNE visualisation that you can explore with `sleepwal
 
 This is single-cell transcriptomics data from the "CiteSeq" paper 
 (Stoeckius et al., *Simultaneous epitope and transcriptome measurement in single cells*, [Nature Methods, 14:865](https://doi.org/10.1038/nmeth.4380), 2017).
-Each point is a cell from a human cord blood sample. Normalised gene expression values were used as coordinates for the feature space, and we have used the [Rtsne package](https://cran.r-project.org/web/packages/Rtsne/index.html) to get a two-dimensional [t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) embedding
+Each point is a cell from a human cord blood sample. A two-dimensional [t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) embedding was obtained by running a [Seurat 
+workflow](https://satijalab.org/seurat/multimodal_vignette.html). Gene expression values were normalised and scaled. [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) was performed
+and all but the first 13 principal components were omitted to reduce noise level. After that tSNE was used to further reduce number of dimensions and get a 2D visualisation.
 
 <div class="aspect-ratio">
 	<iframe src="examples/single_emb.html"></iframe>
 </div>
 
+To the left you can see cell types assigned to each cluster in the [Seurat vignette](https://satijalab.org/seurat/multimodal_vignette.html).
+
 **Move your mouse over the points.** At any moment the colours will show you the *real* (i.e., based on the original data, before the dimension reduction) distances of all the cells to the one cell right under your mouse cursor. (By default, Euclidean feature-space distances are used as the "real" distances.) Thus, simply by moving the mouse you can explore the structure of the data and see whether the embedding gives a faithful representation and where it is distorted.
 
-For instance, we immediately can see that the big upper cluster (let's call it *A*) is not as 
-dense as the big lower one (this one we are going to call *B*).
-When you move your mouse over any of the cells of cluster *B* all other cells in *B* immediately become dark green, showing that they are all really close, but that is not the case for cluster *A*: you can wander along its length and see the green colour "following" you and so see that *B* is extended over a gradient. 
+For instance, we immediately can see that the cluster of T cells (red and green) which is the largest on the plot is in fact in fact among the most dense ones. If you put the mouse over one of the T cells, almost the entire 
+cluster immediately light up in black or dark-green. Compare that, for example, with seemingly small and compact cluster of B cells (intense green), or, even more so, with megakaryocytes (lilac, close to the T cells)
+or erythrocytes (pink, upper-right corner). These small clusters contain cells that are further away from each other than are some entire clusters. To see any similarity between megakaryocytes you need to increase the 
+limit of the colour scale (press the “+” button).
 
-You can also
-observe the gradual change from *B* to the smaller cluster to its upper left, when moving through their thin connection. The small cluster at the very top of the plot is depcited really dense but you cann notice that, in reality, it is the least dense
-one. Actually, to see any similarity between neighbours in this cluster, you will have to change the colour scale (click the `+` button twice). 
+We can also see the reason why tSNE failed to separate CD4+ (red) and CD8+ T cells (green). The differences between the two are so subtle that we can hardly see it. Moreover, there is no distinct border between them.
+Try to move the mouse to the very right tip of the CD8+ T cells cluster to see a continuous change from the CD8+ T cells to CD4+ T cells (from right to the left). Yet we know that there is CD4+ T cells do not mature to
+become CD8+ and vice verse. So here `sleepwalk` indicates a possibility of some technical artifact that was picked up by tSNE. It is possible that isolating and regressing it out can help to distinguish the cell types
+better.
 
-Try to 
-look closely at all those smaller clusters between *A* and *B*: `sleepwalk` can help you to figure out how justified  their positioning on the plot is, which of them really are "between" *A* and *B*.
+Notice how, when you explore T cells cluster, the upper tip of the B cells cluster lights up. After moving the mouse there we may notice that these cells, even though they are clustered as B cells, resemble other cells in their cluster as much as T cells. This may be an indication of doublets and can be worth further investigation. If you had a running R session instead of exploring this web page, you would be able to select some cells with your mouse. For this you need to press the left mouse button and enclose the points in a selection contour. When you finish the selection, a variable with indices of all selected points will appear in your R session and you can go on with further analysis. 
+
 You can also notice that some of the cells at the edges of the clusters are drastically different from everything else around them. They likely are some sort of outliers.
 
 ## Compare two embeddings

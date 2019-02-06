@@ -4,3 +4,9 @@ _site/
 Gemfile\.lock
 
 Gemfile
+
+test/\.Rhistory
+
+examples/seuratObject\.RData
+
+examples/saveData\.R
