@@ -313,6 +313,10 @@ new_center_cell_A = function() {
          var dists = distance[centerCell[0]][centerCell[1]];
 
      d3.select( "#chart" + ch )
+        .select(".legend")
+        .style( ch == centerCell[0] ? "initial" : "none" ) 
+
+     d3.select( "#chart" + ch )
         .selectAll(".point")
         .attr( "fill", function( d, i ) { return colourScales[centerCell[0]](dists[i]) } )
   }
