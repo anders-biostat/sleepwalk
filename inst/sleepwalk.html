@@ -145,9 +145,9 @@ set_up_chart = function() {
       				.attr("transform", (d, i) => "translate(" + (i * 30) + ", 0)")
       				.on("click", function(d) {
       					if(d[0] == "+")
-      						scaleDist[d[1]] *= 2;
+      						scaleDist[d[1]] *= sqrt(2);
       					if(d[0] == "-")
-      						scaleDist[d[1]] /= 2;
+      						scaleDist[d[1]] /= sqrt(2);
 
       					setColourScale(d[1]);
       					setAxisScale(d[1]);
