@@ -166,7 +166,8 @@ set_up_chart = function() {
   				.text(d => d[0])
   				.attr("x", 11)
   				.attr("y", 11)
-  				.attr("size", 13);
+  				.attr("size", 13)
+          .style("cursor", "default");
 
       //add points
       d3.select( "#chart" + ch )
