@@ -145,9 +145,9 @@ set_up_chart = function() {
       				.attr("transform", (d, i) => "translate(" + (i * 30) + ", 0)")
       				.on("click", function(d) {
       					if(d[0] == "+")
-      						scaleDist[d[1]] *= sqrt(2);
+      						scaleDist[d[1]] *= Math.sqrt(2);
       					if(d[0] == "-")
-      						scaleDist[d[1]] /= sqrt(2);
+      						scaleDist[d[1]] /= Math.sqrt(2);
 
       					setColourScale(d[1]);
       					setAxisScale(d[1]);
@@ -313,8 +313,8 @@ new_center_cell_A = function() {
          var dists = distance[centerCell[0]][centerCell[1]];
 
      d3.select( "#chart" + ch )
-        .select(".legend")
-        .style( ch == centerCell[0] ? "initial" : "none" ) 
+        .select("g.legend")
+        .style( "display", ch == centerCell[0] ? "initial" : "none" ) 
 
      d3.select( "#chart" + ch )
         .selectAll(".point")
