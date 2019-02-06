@@ -297,25 +297,25 @@ var updateColour = function(chart) {
 new_center_cell_A = function() {
    for( ch = 0; ch < n_charts; ch++ ) {
 
-	   if(featureMatrix) {
-         var x_sel_cell = featureMatrix[ ch ][ centerCell[1] ],
+     if(featureMatrix) {
+         var x_sel_cell = featureMatrix[ centerCell[0] ][ centerCell[1] ],
             dists = Array( embedding[0].length );
       
          for( var j = 0; j < dists.length; j++ ) {
             var s = 0
             for( var i = 0; i < x_sel_cell.length; i++ ) {
-               var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
+               var dd = x_sel_cell[i] - featureMatrix[centerCell[0]][j][i];
                s += dd * dd;
             }
             dists[j] = Math.sqrt(s);
          }
       } else 
-         var dists = distance[ch][centerCell[1]];
+         var dists = distance[centerCell[0]][centerCell[1]];
 
-	   d3.select( "#chart" + ch )
-	      .selectAll(".point")
-	      .attr( "fill", function( d, i ) { return colourScales[ch](dists[i]) } )
-	}
+     d3.select( "#chart" + ch )
+        .selectAll(".point")
+        .attr( "fill", function( d, i ) { return colourScales[centerCell[0]](dists[i]) } )
+  }
 }
 
 new_center_cell_B = function() {
