@@ -300,7 +300,7 @@ var updateColour = function(chart) {
 			.style("stop-color", d => colourScales[chart](d * scaleDist[chart]));
 }
 
-new_center_cell_A = function() {
+new_center_cell_A = function(retDists) {
    for( ch = 0; ch < n_charts; ch++ ) {
 
      if(featureMatrix) {
@@ -322,15 +322,19 @@ new_center_cell_A = function() {
         .select("g.legend")
         .style( "display", ch == centerCell[0] ? "initial" : "none" ) 
 
+    if(retDists)
+      return dists;
+     
      d3.select( "#chart" + ch )
         .selectAll(".point")
         .attr( "fill", function( d, i ) { return colourScales[centerCell[0]](dists[i]) } )
   }
 }
 
-new_center_cell_B = function() {
+new_center_cell_B = function(retDists) {
 
    var x_sel_cell = featureMatrix[centerCell[0]][ centerCell[1] ];
+   var dists = Array(n_charts);
 
    for( ch = 0; ch < n_charts; ch++ ) {
 
@@ -341,14 +345,22 @@ new_center_cell_B = function() {
             var dd = x_sel_cell[i] - featureMatrix[ch][j][i]
             s += dd * dd
          }
-         distCols[j] = colourScales[ch](s)
+         if(retDists)
+            distCols[j] = s
+         else
+            distCols[j] = colourScales[ch](s);
       }
 
-      d3.select( "#chart" + ch )
-         .selectAll("circle")
-         .attr( "fill", function( d, i ) { return distCols[i] } )
+      if(retDists)
+         dists[ch] = distCols
+      else
+         d3.select( "#chart" + ch )
+            .selectAll("circle")
+            .attr( "fill", function( d, i ) { return distCols[i] } );
 
    }
+   if(retDists)
+      return dists;
 }
 
 addSVGs = function(n) {
@@ -367,6 +379,21 @@ addSVGs = function(n) {
                .append("td")
                   .append("svg")
                      .attr("id", d => "chart" + (d[0] * nrow + d[1]));
+}
+
+getSnapshotData = function(point, emb) {
+   centerCell = [emb, point];
+
+   var dists = (mode == "A" ? new_center_cell_A(true) : new_center_cell_B(true)),
+      embs = Array(n_charts);
+   for(var i = 0; i < n_charts; i++)
+      embs[i] = embedding[i].map((el, j) => el.concat(mode == "A" ? [dists[j]] : dists[i][j]));
+
+   if(jrc) {
+      jrc.sendData("embs", embs);
+      jrc.sendData("maxdists", scaleDist);
+      jrc.sendData("finished", 1);
+   }
 }
 
 </script>

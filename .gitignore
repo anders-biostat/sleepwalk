@@ -8,3 +8,7 @@ _site/
 R/\.Rhistory
 
 test/\.Rhistory
+
+examples/saveData\.R
+
+examples/seuratObject\.RData

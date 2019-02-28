@@ -53,7 +53,7 @@
 #' @importFrom jsonlite toJSON
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, 
-                       distances = NULL, same = c( "objects", "features" ), saveToFile = NULL ) {
+                       distances = NULL, same = c( "objects", "features" ), saveToFile = NULL) {
   same = match.arg( same )
   
   if(is.null(featureMatrices)) {
@@ -191,3 +191,55 @@ slw_on_selection <- function(points, emb) {
   message(paste0("It's first argument is a vector of indices of all the selected points, and the second one is the index of ",
                  "the embedding, where they were selected."))
 }
+
+#' @importFrom httpuv service
+#' @import ggplot2
+#' @importFrom scales squish
+#' @importFrom cowplot plot_grid
+#' @export
+slw_snapshot <- function(point, emb = 1) {
+  stopifnot(is.numeric(point))
+  stopifnot(is.numeric(emb))
+  
+  if(length(point) > 1) {
+    warning("More than one focuse point is provided, only the first one will be used.")
+    point <- point[1]
+  }
+  if(length(emb) > 1) {
+    warning("More than one focuse embedding is provided, only the first one will be used.")
+    emb <- emb[1]
+  }
+  
+  en <- new.env()
+  JsRCom::setEnvironment(en)
+  en$finished <- 0
+  JsRCom::sendCommand(paste0("getSnapshotData(", point - 1, ", ", emb - 1, ");"))
+
+  for( i in 1:(10/0.05) ) {
+    service(100)
+    if( en$finished > 0 ) 
+      break
+    
+    Sys.sleep( .05 )
+  }
+  
+  JsRCom::setEnvironment(globalenv())
+  
+  if( en$finished == 0 )
+    stop( "Failed to get embedding data from the server" )
+
+  maxdists <- en$maxdists
+  colours <- c("#000000", "#1A1935", "#15474E", "#2B6F39", "#767B33", "#C17A6F", "#D490C6", "#C3C0F2")
+
+  if(length(maxdists) == 1) {
+    data <- as.data.frame(en$embs[1, , ])
+    remove(en)
+    colnames(data) <- c("x1", "x2", "dists")
+    ggplot(data) + geom_point(aes(x = x1, y = x2, colour = dists)) +
+      scale_color_gradientn(colours = colours, limits = c(0, maxdists), oob = squish) +
+      theme(axis.title = element_blank(), axis.line = element_blank(),
+            axis.text = element_blank(), axis.ticks = element_blank(),
+            legend.position = "bottom", legend.title = element_blank()) + guides(colour = guide_colourbar(barwidth = 15, barheight = 0.5))
+  }
+}
+
