@@ -194,9 +194,17 @@ set_up_chart = function() {
          	window["new_center_cell_" + mode]();
          }
       })( ch );
+      on_double_click = ( function(ch) {
+         return function( d, i ) { 
+            if(jrc){
+               jrc.sendCommand("message('Use \"slw_snapshot(" + (i + 1) + ", " + (ch + 1) + ")\" to get this plot in your R Session')");
+            }  
+         }
+      })( ch );
       d3.select( "#chart" + ch )
          .selectAll("circle")
-	         .on( "mouseover", on_mouse_over );
+	         .on( "mouseover", on_mouse_over )
+            .on( "dblclick", on_double_click );
 
       d3.select("#chart" + ch)
          .call(function(ch) {
@@ -301,40 +309,39 @@ var updateColour = function(chart) {
 }
 
 new_center_cell_A = function(retDists) {
-   for( ch = 0; ch < n_charts; ch++ ) {
-
-     if(featureMatrix) {
-         var x_sel_cell = featureMatrix[ centerCell[0] ][ centerCell[1] ],
-            dists = Array( embedding[0].length );
+   if(featureMatrix) {
+      var x_sel_cell = featureMatrix[ centerCell[0] ][ centerCell[1] ],
+         dists = Array( embedding[0].length );
       
-         for( var j = 0; j < dists.length; j++ ) {
-            var s = 0
-            for( var i = 0; i < x_sel_cell.length; i++ ) {
-               var dd = x_sel_cell[i] - featureMatrix[centerCell[0]][j][i];
-               s += dd * dd;
-            }
-            dists[j] = Math.sqrt(s);
+      for( var j = 0; j < dists.length; j++ ) {
+         var s = 0
+         for( var i = 0; i < x_sel_cell.length; i++ ) {
+            var dd = x_sel_cell[i] - featureMatrix[centerCell[0]][j][i];
+            s += dd * dd;
          }
-      } else 
-         var dists = distance[centerCell[0]][centerCell[1]];
+         dists[j] = Math.sqrt(s);
+      }
+   } else 
+      var dists = distance[centerCell[0]][centerCell[1]];
+
+   for( ch = 0; ch < n_charts; ch++ ) {
 
      d3.select( "#chart" + ch )
         .select("g.legend")
-        .style( "display", ch == centerCell[0] ? "initial" : "none" ) 
+        .style( "display", ch == centerCell[0] ? "initial" : "none" );
 
-    if(retDists)
-      return dists;
-     
-     d3.select( "#chart" + ch )
-        .selectAll(".point")
-        .attr( "fill", function( d, i ) { return colourScales[centerCell[0]](dists[i]) } )
+      d3.select( "#chart" + ch )
+         .selectAll(".point")
+         .attr( "fill", function( d, i ) { return colourScales[centerCell[0]](dists[i]) } );
   }
+  if(retDists)
+   return [dists];
 }
 
 new_center_cell_B = function(retDists) {
 
    var x_sel_cell = featureMatrix[centerCell[0]][ centerCell[1] ];
-   var dists = Array(n_charts);
+   var allDists = Array(n_charts);
 
    for( ch = 0; ch < n_charts; ch++ ) {
 
@@ -352,15 +359,15 @@ new_center_cell_B = function(retDists) {
       }
 
       if(retDists)
-         dists[ch] = distCols
-      else
-         d3.select( "#chart" + ch )
-            .selectAll("circle")
-            .attr( "fill", function( d, i ) { return distCols[i] } );
+         allDists[ch] = distCols;
+      
+      d3.select( "#chart" + ch )
+         .selectAll("circle")
+         .attr( "fill", function( d, i ) { return distCols[i] } );
 
    }
    if(retDists)
-      return dists;
+      return allDists;
 }
 
 addSVGs = function(n) {
@@ -384,14 +391,13 @@ addSVGs = function(n) {
 getSnapshotData = function(point, emb) {
    centerCell = [emb, point];
 
-   var dists = (mode == "A" ? new_center_cell_A(true) : new_center_cell_B(true)),
-      embs = Array(n_charts);
-   for(var i = 0; i < n_charts; i++)
-      embs[i] = embedding[i].map((el, j) => el.concat(mode == "A" ? [dists[j]] : dists[i][j]));
+   var dists = (mode == "A" ? new_center_cell_A(true) : new_center_cell_B(true));
 
    if(jrc) {
-      jrc.sendData("embs", embs);
-      jrc.sendData("maxdists", scaleDist);
+      jrc.sendData("embs", embedding);
+      jrc.sendData("dists", dists);
+      jrc.sendData("pointSize", pointSize);
+      jrc.sendData("maxdists", mode == "A" ? scaleDist[centerCell[0]] : scaleDist);
       jrc.sendData("finished", 1);
    }
 }

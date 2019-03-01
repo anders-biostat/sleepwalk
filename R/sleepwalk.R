@@ -71,6 +71,9 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     embeddings <- list(embeddings)
   stopifnot( is.list(embeddings) )
   
+  if(length(embeddings) == 1 && same == "features")
+    same = "objects"
+  
   if(!is.null(dim(featureMatrices)))
     featureMatrices <- list(featureMatrices)
   if(!is.null(dim(distances)))
@@ -230,16 +233,48 @@ slw_snapshot <- function(point, emb = 1) {
 
   maxdists <- en$maxdists
   colours <- c("#000000", "#1A1935", "#15474E", "#2B6F39", "#767B33", "#C17A6F", "#D490C6", "#C3C0F2")
-
-  if(length(maxdists) == 1) {
-    data <- as.data.frame(en$embs[1, , ])
-    remove(en)
+  if(is.list(en$embs)) {
+    n_charts <- length(en$embs)    
+  } else {
+    n_charts <- dim(en$embs)[1]
+  }
+  
+  if(n_charts == 1) {
+    data <- as.data.frame(cbind(en$embs[1, , ], en$dists[1, ]))
     colnames(data) <- c("x1", "x2", "dists")
-    ggplot(data) + geom_point(aes(x = x1, y = x2, colour = dists)) +
+    ggplot(data) + geom_point(aes(x = x1, y = x2, colour = dists), size = en$pointSize/2) +
       scale_color_gradientn(colours = colours, limits = c(0, maxdists), oob = squish) +
-      theme(axis.title = element_blank(), axis.line = element_blank(),
-            axis.text = element_blank(), axis.ticks = element_blank(),
+      theme(axis.title = element_blank(), axis.line = element_blank(), panel.grid.major = element_blank(),
+            axis.text = element_blank(), axis.ticks = element_blank(), panel.grid.minor = element_blank(),
             legend.position = "bottom", legend.title = element_blank()) + guides(colour = guide_colourbar(barwidth = 15, barheight = 0.5))
+  } else {
+    plots <- list()
+    for(i in 1:n_charts) {
+      if(is.list(en$embs)) {
+        data <- as.data.frame(en$embs[[i]])
+      } else {
+        data <- as.data.frame(en$embs[i, , ])
+      }
+      colnames(data) <- c("x1", "x2")
+      if(is.list(en$dists)) {
+        data$dists <- en$dists[[i]]
+        md <- maxdists[i]
+      } else {
+        if(dim(en$dists)[1] == 1) {
+          data$dists <- en$dists[1, ]
+          md <- maxdists
+        } else {
+          data$dists <- en$dists[i, ]
+          md <- maxdists[i]
+        }
+      }
+      plots[[i]] <-     ggplot(data) + geom_point(aes(x = x1, y = x2, colour = dists), size = en$pointSize/2) +
+        scale_color_gradientn(colours = colours, limits = c(0, md), oob = squish) +
+        theme(axis.title = element_blank(), axis.line = element_blank(), panel.grid.major = element_blank(),
+              axis.text = element_blank(), axis.ticks = element_blank(), panel.grid.minor = element_blank(),
+              legend.position = "bottom", legend.title = element_blank()) + guides(colour = guide_colourbar(barwidth = 15, barheight = 0.5))
+    }
+    plot_grid(plotlist = plots)
   }
 }
 
