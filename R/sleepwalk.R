@@ -200,7 +200,7 @@ slw_on_selection <- function(points, emb) {
 #' @importFrom scales squish
 #' @importFrom cowplot plot_grid
 #' @export
-slw_snapshot <- function(point, emb = 1) {
+slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
   stopifnot(is.numeric(point))
   stopifnot(is.numeric(emb))
   
@@ -274,7 +274,11 @@ slw_snapshot <- function(point, emb = 1) {
               axis.text = element_blank(), axis.ticks = element_blank(), panel.grid.minor = element_blank(),
               legend.position = "bottom", legend.title = element_blank()) + guides(colour = guide_colourbar(barwidth = 15, barheight = 0.5))
     }
-    plot_grid(plotlist = plots)
+    if(returnList) {
+      plots
+    } else {
+      plot_grid(plotlist = plots)
+    }
   }
 }
 
