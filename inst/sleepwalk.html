@@ -345,25 +345,23 @@ new_center_cell_B = function(retDists) {
 
    for( ch = 0; ch < n_charts; ch++ ) {
 
-      var distCols = Array( embedding[ch].length )
-      for( var j = 0; j < distCols.length; j++ ) {
+      var dists = Array( embedding[ch].length )
+      for( var j = 0; j < dists.length; j++ ) {
          var s = 0
          for( var i = 0; i < x_sel_cell.length; i++ ) {
             var dd = x_sel_cell[i] - featureMatrix[ch][j][i]
             s += dd * dd
          }
-         if(retDists)
-            distCols[j] = s
-         else
-            distCols[j] = colourScales[ch](s);
-      }
+
+         dists[j] = Math.sqrt(s);
+     }
 
       if(retDists)
-         allDists[ch] = distCols;
+         allDists[ch] = dists;
       
       d3.select( "#chart" + ch )
          .selectAll("circle")
-         .attr( "fill", function( d, i ) { return distCols[i] } );
+         .attr( "fill", function( d, i ) { return colourScales[ch](dists[i]) } );
 
    }
    if(retDists)
