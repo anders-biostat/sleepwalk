@@ -14,7 +14,7 @@
 #' @param embeddings either an \eqn{n x 2} embedding matrix (where \eqn{n} is a number of points) or
 #' a list of \eqn{n_i x 2} matices - one for each embedding. If \code{same = "objects"} all embedding
 #' matrices must have the same number of rows.
-#' @param featureMatrices either an \eqn{n x m} matrix of points coordinates in the feature-dimension
+#' @param featureMatrices either an \eqn{n x m} matrix of point coordinates in the feature-dimension
 #' space or a list of such matrices - one for each embedding. The displayed distances will be calculated 
 #' as Euclidean distances of the rows of these matrices. Alternatively, if \code{same = "objects"}
 #' it is possible to provide the distances directly via the \code{distances} argument. 
@@ -26,7 +26,7 @@
 #' If not provided, maximum distances will be estimated automatically as median value of the 
 #' distances.
 #' @param pointSize size of the points on the plots.
-#' @param distances distances (in feature spase) between points that should be displayed as colours.
+#' @param distances distances (in feature space) between points that should be displayed as colours.
 #' This is an alternative to \code{featureMatrices} if \code{same = "objects"}.
 #' @param same defines what kind of distances to show; must be one of \code{"objects", "features"}.
 #' \code{same = "objects"} is used when all the embeddings show the same set of points. In this case,
