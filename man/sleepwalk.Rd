@@ -13,7 +13,7 @@ sleepwalk(embeddings, featureMatrices = NULL, maxdists = NULL,
 a list of \eqn{n_i x 2} matices - one for each embedding. If \code{same = "objects"} all embedding
 matrices must have the same number of rows.}
 
-\item{featureMatrices}{either an \eqn{n x m} matrix of points coordinates in the feature-dimension
+\item{featureMatrices}{either an \eqn{n x m} matrix of point coordinates in the feature-dimension
 space or a list of such matrices - one for each embedding. The displayed distances will be calculated 
 as Euclidean distances of the rows of these matrices. Alternatively, if \code{same = "objects"}
 it is possible to provide the distances directly via the \code{distances} argument. 
@@ -28,13 +28,15 @@ distances.}
 
 \item{pointSize}{size of the points on the plots.}
 
-\item{distances}{distances (in feature spase) between points that should be displayed as colours.
+\item{distances}{distances (in feature space) between points that should be displayed as colours.
 This is an alternative to \code{featureMatrices} if \code{same = "objects"}.}
 
-\item{same}{defines what kind of distances to show; must be one of \code{"objects", "features"}.
-\code{same = "objects"} is used when all the embeddings show the same set of points. In this case,
-the distance from the selected point on each of embedding to all other points of the same embedding
-is shown. The same or different feature of distance matrix can be used for that. \code{same = "features"}
+\item{same}{defines what kind of distances to show; must be either \code{"objects"} or \code{"features"}.
+Use \code{same = "objects"} when all the embeddings show the same set of points. In this case,
+each embedding is colored to show the distance of the selected point to all other points.
+The same or different features can be supplied as \code{featureMatrices}, to use the same or different distances
+in the different embeddings.
+\code{same = "features"}
 is used to compare different sets of points (e.g. samples from different patients, or different batches) 
 in the same feature space. In this case the distance is calculated from the selected point to all other 
 points (including those in other embeddings).}
@@ -45,10 +47,11 @@ default browser. Note, that if you try to save that page, using your browser's f
 it'll become static.
 
 The function opens a browser window and displays the embeddings as point clouds. When the user
-moves the mouse over a point, all data points change colour such that their colour indicates
+moves the mouse over a point, the point gets selected and all data points change colour such
+that their colour indicates
 the feature-space distance to the point under the mouse cursor. This allows to quickly and
 intuitively check how tight clusters are, how faithful the embedding is, and how similar
-the clusters are.}
+the clusters are to each other.}
 }
 \value{
 None.
