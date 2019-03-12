@@ -44,14 +44,7 @@ points (including those in other embeddings).}
 \item{saveToFile}{path to the .html file where to save the plots. The resulting page will be fully interactive
 and contain all the data. If this is \code{NULL}, than the plots will be shown as the web page in your 
 default browser. Note, that if you try to save that page, using your browser's functionality,
-it'll become static.
-
-The function opens a browser window and displays the embeddings as point clouds. When the user
-moves the mouse over a point, the point gets selected and all data points change colour such
-that their colour indicates
-the feature-space distance to the point under the mouse cursor. This allows to quickly and
-intuitively check how tight clusters are, how faithful the embedding is, and how similar
-the clusters are to each other.}
+it'll become static.}
 }
 \value{
 None.
@@ -59,6 +52,14 @@ None.
 \description{
 A function to interactively explore a 2D embedding of some higher-dimensional
 point cloud, as produced by a dimension reduction method such as MDS, t-SNE, or the like.
+}
+\details{
+The function opens a browser window and displays the embeddings as point clouds. When the user
+moves the mouse over a point, the point gets selected and all data points change colour such
+that their colour indicates
+the feature-space distance to the point under the mouse cursor. This allows to quickly and
+intuitively check how tight clusters are, how faithful the embedding is, and how similar
+the clusters are to each other.
 }
 \author{
 Simon Anders, Svetlana Ovchinnikova
