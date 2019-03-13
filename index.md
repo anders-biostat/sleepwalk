@@ -119,3 +119,19 @@ Finally, instead of opening the app in a browser, you can ask to **save everythi
 Sleepwalk is beeing developed by [Svetlana Ovchinnikova](mailto:s.ovchinnikova@zmbh.uni-heidelberg.de) and [Simon Anders](mailto:s.anders@zmbh.uni-heidelberg.de) at the [Center for Molecular Biology of the University of Heidelberg](https://www.zmbh.uni-heidelberg.de/anders). Please contact us for questions or feedback, or file an [issue](https://github.com/anders-biostat/sleepwalk/issues) on GitHub if you find a bug.
 
 
+<!-- Default Statcounter code for anders-biostat.github.io
+https://anders-biostat.github.io -->
+<script type="text/javascript">
+var sc_project=11967766; 
+var sc_invisible=1; 
+var sc_security="4f345b9a"; 
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11967766/0/4f345b9a/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
