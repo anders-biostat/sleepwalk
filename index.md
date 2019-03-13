@@ -106,6 +106,17 @@ The optional parameter `pointsize` allwos you to change the size of the points.
 
 Finally, instead of opening the app in a browser, you can ask to **save everything to an HTML file**, by passing a file name in the optional `saveToFile` parameter. This file will then contaiin all your data and the sleepwalk app code (in JavaScript), so that you can view it in any web browser without needing to have an R session running. This can be useful to share your sleepwalk visualization with colleagues unfamiliar with R or to provide your embedding as an interactive supplement in a publication.
 
+# For Seurat users
+
+If you have a Seurat data object, and have already run Seurat's `RunPCA` and `RunTSNE` functions on it, then you can use Sleepwalk simply by executing
+
+```
+sleepwalk( seu@dr$tsne@cell.embeddings, seu@dr$pca@cell.embeddings )
+```
+
+This takes the t-SNE embeddinng stored in the Seurat data object `seu` and displays it with t-SNE. 
+
+(Note: The feature-space distances are calculated from the PCA coordinates, as this is what the t-SNE function gets by default. It is, of course, more accurate to pass as second parameter not the principal components buts the full data, and to do so, replace `seu@dr$pca@cell.embeddings` with `seu@data`. However, `data` is a huge matrix, and Sleepwalk might become quite slow.)
 
 # Authors
 
