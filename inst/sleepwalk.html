@@ -74,6 +74,8 @@ mode = "A";
 
 pointSize = 1.5;
 
+titles = [];
+
 featureMatrix = undefined;
 distance = undefined;
 
@@ -119,9 +121,11 @@ set_up_chart = function() {
 
 	   //group of all legend related elements
       var legend = d3.select("#chart" + ch)
+        .attr( "width", width )
+        .attr( "height", +width + 75) //75px for the colour legend and title
       	.append("g")
       		.attr("class", "legend")
-      		.attr("transform", "translate(15, " + width + ")");
+      		.attr("transform", "translate(15, " + (width + 20) + ")");
 
      	//here goes the axis
      	legend
@@ -174,19 +178,31 @@ set_up_chart = function() {
   				.attr("size", 13)
           .style("cursor", "default");
 
+      //add titles
+      if(titles.length > 0) {
+        d3.select("#chart" + ch)
+          .append("text")
+            .attr("text-anchor", "middle")
+            .attr("transform", "translate(" + width/2 + ", 15)")
+            .style("font-family", "Calibri")
+            .style("font-weight", "bold")
+            .text(titles[ch]);
+      }
+
       //add points
       d3.select( "#chart" + ch )
-	      .attr( "width", width )
-	      .attr( "height", +width + 75) //75px for the colour legend
- 	      .selectAll("circle")
-	      .data( embedding[ch].map((el, i) => el.concat(i)) )
-	      .enter().append( "circle" )
-	         .attr( "cx", function(d) { return embeddingScales[ch].x( d[0] ) } )
-	         .attr( "cy", function(d) { return embeddingScales[ch].y( d[1] ) } )
-	         .attr( "r", pointSize )
+        .append("g")
+          .attr("class", "points")
+          .attr("transform", "translate(0, 20)")
+          .selectAll("circle")
+          .data( embedding[ch].map((el, i) => el.concat(i)) )
+	        .enter().append( "circle" )
+	          .attr( "cx", function(d) { return embeddingScales[ch].x( d[0] ) } )
+	          .attr( "cy", function(d) { return embeddingScales[ch].y( d[1] ) } )
+	          .attr( "r", pointSize )
             .attr( "class", "point" )
-	         .attr( "stroke", 0 )
-	         .attr( "fill", "gray" );
+	          .attr( "stroke", 0 )
+	          .attr( "fill", "gray" );
 
       on_mouse_over = ( function(ch) {
          return function( d, i ) { 
@@ -396,6 +412,7 @@ getSnapshotData = function(point, emb) {
       jrc.sendData("dists", dists);
       jrc.sendData("pointSize", pointSize);
       jrc.sendData("maxdists", mode == "A" ? scaleDist[centerCell[0]] : scaleDist);
+      jrc.sendData("titles", titles);
       jrc.sendData("finished", 1);
    }
 }

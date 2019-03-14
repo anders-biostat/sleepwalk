@@ -57,7 +57,7 @@
 #' 
 #' @importFrom jsonlite toJSON
 #' @export
-sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, 
+sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
                        distances = NULL, same = c( "objects", "features" ), saveToFile = NULL) {
   same = match.arg( same )
   
@@ -114,6 +114,19 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     else
       stopifnot( ncol( featureMatrices[[i]] ) == ncol( featureMatrices[[1]] ) )
   }
+  
+  if(!is.null(titles)) {
+    stopifnot(length(titles) == length(embeddings))  
+  } else {
+    if(!is.null(names(embeddings))) {
+      titles <- names(embeddings)
+    } else {
+      titles <- rep("", length(embeddings))
+    }
+  }
+  
+  if(!is.null(names(embeddings)))
+    embeddings <- unname(embeddings)
       
   #estimate maxdists from the data
   if(is.null(maxdists)) {
@@ -146,6 +159,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
       JsRCom::sendData( "mode", "B" )
     
     JsRCom::sendData( "n_charts", length(embeddings) )
+    JsRCom::sendData( "titles", titles, TRUE )
     JsRCom::sendData( "maxdist", maxdists, TRUE )
     JsRCom::sendData( "embedding", embeddings, TRUE )
     if(!is.null(featureMatrices)) {
@@ -174,6 +188,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
         paste0("featureMatrix = ", toJSON(featureMatrices), ";"),
         paste0("distance = ", toJSON(distances), ";")),
       paste0("pointSize = ", pointSize, ";"),
+      paste0("titles = ", toJSON(titles), ";"),
       "set_up_chart();"
     )
     
@@ -249,6 +264,7 @@ slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
     colnames(data) <- c("x1", "x2", "dists")
     ggplot(data) + geom_point(aes(x = x1, y = x2, colour = dists), size = en$pointSize/2) +
       scale_color_gradientn(colours = colours, limits = c(0, maxdists), oob = squish) +
+      ggtitle(en$titles) +
       theme(axis.title = element_blank(), axis.line = element_blank(), panel.grid.major = element_blank(),
             axis.text = element_blank(), axis.ticks = element_blank(), panel.grid.minor = element_blank(),
             legend.position = "bottom", legend.title = element_blank()) + guides(colour = guide_colourbar(barwidth = 15, barheight = 0.5))
@@ -275,6 +291,7 @@ slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
       }
       plots[[i]] <-     ggplot(data) + geom_point(aes(x = x1, y = x2, colour = dists), size = en$pointSize/2) +
         scale_color_gradientn(colours = colours, limits = c(0, md), oob = squish) +
+        ggtitle(en$titles[i]) +
         theme(axis.title = element_blank(), axis.line = element_blank(), panel.grid.major = element_blank(),
               axis.text = element_blank(), axis.ticks = element_blank(), panel.grid.minor = element_blank(),
               legend.position = "bottom", legend.title = element_blank()) + guides(colour = guide_colourbar(barwidth = 15, barheight = 0.5))
