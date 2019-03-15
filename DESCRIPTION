@@ -3,11 +3,15 @@ Type: Package
 Title: Interatively explore dimension-reduced embeddings
 Version: 0.1.0
 Date: 2018-10-02
-Author: Simon Anders
-Maintainer: Simon Anders <sanders@fs.tum.de>
+Authors@R: as.person(c(
+    "Svetlana Ovchinnikova <s.ovchinnikova@zmbh.uni-heidelberg.de> [aut,cre]",
+    "Simon Anders <sanders@fs.tum.de> [aut]"
+))
 Description: The package provides functions to interactively explore the
   embeddings created by dimension reduction methods such as PCA, MDS, 
   t-SNE or UMap.
 License: GPL-3
-Imports: JsRCom
+Imports: JsRCom, cowplot, httpuv, jsonlite, scales
 RoxygenNote: 6.1.1
+URL: https://anders-biostat.github.io/sleepwalk/
+BugReports: https://github.com/anders-biostat/sleepwalk/issues
