@@ -79,11 +79,11 @@ titles = [];
 featureMatrix = undefined;
 distance = undefined;
 
-var centerCell, xDomain, yDomain;
+var centerCell, xDomain, yDomain, ncol, nrow;
 
 set_up_chart = function() {
 
-   addSVGs(n_charts);
+   addSVGs(n_charts, ncol, nrow);
 
   	colourScales = [];
   	axisScales = [];
@@ -384,9 +384,19 @@ new_center_cell_B = function(retDists) {
       return allDists;
 }
 
-addSVGs = function(n) {
-   var ncol = Math.ceil(Math.sqrt(n)),
+addSVGs = function(n, ncol, nrow) {
+  if(ncol == undefined) {
+    if(nrow == undefined) {
+      ncol = Math.ceil(Math.sqrt(n));
       nrow = Math.ceil(n / ncol);
+    } else {
+      ncol = Math.ceil(n / nrow);
+    }    
+  } else {
+    if(nrow == undefined)
+      nrow = Math.ceil(n / ncol);
+  }
+   
    d3.select("#embeddings")
       .selectAll("tr")
          .data(d3.range(nrow))
