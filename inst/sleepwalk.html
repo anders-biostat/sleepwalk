@@ -325,33 +325,50 @@ var updateColour = function(chart) {
 }
 
 new_center_cell_A = function(retDists) {
+   var allDists = Array(compare == "distances" ? n_charts : 1);
+
    if(featureMatrix) {
       var x_sel_cell = featureMatrix[ centerCell[0] ][ centerCell[1] ],
          dists = Array( embedding[0].length );
-      
-      for( var j = 0; j < dists.length; j++ ) {
-         var s = 0
-         for( var i = 0; i < x_sel_cell.length; i++ ) {
-            var dd = x_sel_cell[i] - featureMatrix[centerCell[0]][j][i];
-            s += dd * dd;
+   }
+
+   get_dists = function(ch) {
+      if(featureMatrix) {
+         for( var j = 0; j < dists.length; j++ ) {
+            var s = 0
+            for( var i = 0; i < x_sel_cell.length; i++ ) {
+               var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
+               s += dd * dd;
+            }
+            dists[j] = Math.sqrt(s);
          }
-         dists[j] = Math.sqrt(s);
-      }
-   } else 
-      var dists = distance[centerCell[0]][centerCell[1]];
+      } else 
+         var dists = distance[ch][centerCell[1]];
+
+      return dists;
+   }
+
+   if(compare == "distances")
+      for(ch = 0; ch < n_charts; ch++)
+         allDists[ch] = get_dists(ch)
+   else
+      allDists[0] = get_dists(centerCell[0]);
 
    for( ch = 0; ch < n_charts; ch++ ) {
+      d3.select( "#chart" + ch )
+         .select("g.legend")
+         .style( "display", ch == centerCell[0] ? "initial" : "none" );
 
-     d3.select( "#chart" + ch )
-        .select("g.legend")
-        .style( "display", ch == centerCell[0] ? "initial" : "none" );
+      var colourScale = (compare == "distances" ? colourScales[ch] : colourScales[centerCell[0]]),
+         dists = (compare == "distances" ? allDists[ch] : allDists[0]);
 
       d3.select( "#chart" + ch )
          .selectAll(".point")
-         .attr( "fill", function( d, i ) { return colourScales[centerCell[0]](dists[i]) } );
+         .attr( "fill", function( d, i ) { return colourScale(dists[i]) } );
   }
+
   if(retDists)
-   return [dists];
+   return allDists;
 }
 
 new_center_cell_B = function(retDists) {

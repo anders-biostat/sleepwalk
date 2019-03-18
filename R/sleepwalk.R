@@ -58,8 +58,10 @@
 #' @importFrom jsonlite toJSON
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
-                       distances = NULL, same = c( "objects", "features" ), saveToFile = NULL, ncol = NULL, nrow = NULL) {
+                       distances = NULL, same = c( "objects", "features" ), compare = c("embeddings", "distances"),
+                       saveToFile = NULL, ncol = NULL, nrow = NULL) {
   same = match.arg( same )
+  compare = match.arg( compare )
   
   if(is.null(featureMatrices)) {
     if(same == "features")
@@ -172,6 +174,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
       JsRCom::sendData( "ncol", ncol )
     if(!is.null(nrow))
       JsRCom::sendData( "nrow", nrow )
+    JsRCom::sendData( "compare", compare )
     JsRCom::sendCommand( "set_up_chart()" )
   } else {
     content <- readLines(paste0(system.file( package="sleepwalk" ), "/", "sleepwalk.html"), warn = F)
@@ -193,6 +196,9 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
         paste0("distance = ", toJSON(distances), ";")),
       paste0("pointSize = ", pointSize, ";"),
       paste0("titles = ", toJSON(titles), ";"),
+      paste0("nrow = ", nrow, ";"),
+      paste0("ncol = ", ncol, ";"),
+      paste0("compare = ", compare, ";"),
       "set_up_chart();"
     )
     
