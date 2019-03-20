@@ -196,9 +196,11 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
         paste0("distance = ", toJSON(distances), ";")),
       paste0("pointSize = ", pointSize, ";"),
       paste0("titles = ", toJSON(titles), ";"),
-      paste0("nrow = ", nrow, ";"),
-      paste0("ncol = ", ncol, ";"),
-      paste0("compare = ", compare, ";"),
+      ifelse(!is.null(nrow), 
+        paste0("nrow = ", nrow, ";"), ""),
+      ifelse(!is.null(ncol),
+        paste0("ncol = ", ncol, ";"), ""),
+      paste0("compare = '", compare, "';"),
       "set_up_chart();"
     )
     

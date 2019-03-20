@@ -327,12 +327,11 @@ var updateColour = function(chart) {
 new_center_cell_A = function(retDists) {
    var allDists = Array(compare == "distances" ? n_charts : 1);
 
-   if(featureMatrix)
-      var x_sel_cell = featureMatrix[ centerCell[0] ][ centerCell[1] ];
 
    get_dists = function(ch) {
       if(featureMatrix) {
-         var dists = Array( embedding[ch].length );
+         var dists = Array( embedding[ch].length ),
+            x_sel_cell = featureMatrix[ ch ][ centerCell[1] ];
 
          for( var j = 0; j < dists.length; j++ ) {
             var s = 0
