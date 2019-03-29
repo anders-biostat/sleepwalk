@@ -63,18 +63,16 @@ obtained with another dimensionality reduction approach. This time, we have used
 The main idea is the same: you move the mouse over an embedding and colour shows you the real distance from the current point to all others. But now you see distances from the same point on the other embedding as well. This allows you immediately identify the same clusters from both visualisations 
 and gives you an easy way to compare two (or more if you want) dimensionality reduction techniques applied to your data.
 
-## Compare two sets of samples
+## Compare several sets of samples
 
-You can use `sleepwalk` to compare not only different embeddings for the same data, but also to compare different samples. As example data we use here glioma samples from two patients (out of six, presented in the paper) 
-by Filbin et al. (*Developmental and oncogenic programs in H3K27M gliomas dissected by single-cell RNA-seq*, [Science, 360:6386](https://doi.org/10.1126/science.aao4750), 2018).
-Again, single-cell transcriptomics has been used to study each sample, and again we have used t-SNE to visualise them.
+You can use `sleepwalk` to compare not only different embeddings for the same data, but also to compare different samples. As example data we use here samples of the developing murine cerebellum at different time points by Carter et al., (*A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum*, [Current Biology, 28:18](https://doi.org/10.1016/j.cub.2018.07.062), 2018).
+Again, single-cell transcriptomics has been used to study each sample, but here we have used UMAP to visualise them. Two of the samples are biological replicates both taken at time point E13.5. The third one has been taken at time point E14.5.
 
 <div class="aspect-ratio">
 	<iframe src="examples/comp_samp.html"></iframe>
 </div>
 
-Here, our goal is to figure out if there are corresponding groups of cells in the two samples and what those groups are. `sleepwalk` can help here, too. The colour now shows the distance from the cell under the mouse cursor to all other cells in <i>all</i> the embeddings, allowing us to find the most similar cells not only in the current but also in the other samples. We can immediately see that the two largest clusters in both samples not only correspond to each other, but also are arranged in a similar manner: Move the mouse along the large cluster in one of the plots to see it.
-The small cluster at the bottom of the right-hand plot probably corresponds to a group of clusters on the other plot. We also can clearly see that each sample has a population of cells not present in the other one.
+Here, our goal is to figure out if there are corresponding groups of cells in the two samples and what those groups are. `sleepwalk` can help here, too. The colour now shows the distance from the cell under the mouse cursor to all other cells in <i>all</i> the embeddings, allowing us to find the most similar cells not only in the current but also in the other samples. Exploring the data with the mouse shows the two replicas of E13.5 samples are almost identical. The two branches (GABAergic and glutamatergic neurons) can be easily followed from the early progenitor cells up to the most differentiated ones. Comparing between the two E13.5 replicates reveals which aspects of the peculiar two-pronged shape of the glutamatergic branch is simply due to random variation and what seems reproducible. In the later E14.5 sample, the branches have disconnected from the progenitor cells, but Sleepwalk allows us to still identify corresponding cells. Interestingly, Sleepwalk can show that the GABAergic lineage is differentiated further in the E14.5 than in E13.5 samples, as the endpoint of the branch in E14.5 corresponds to an intermediate point in E13.5. Sleepwalk allows one to discover such details immediately, with minimal effort. Of course, such a visual exploration cannot replace a tailored detailed analysis but it is does provide a starting point and a first overview.
 
 # Installation
 
@@ -102,7 +100,7 @@ You also have to specify `maxdists`: the maximum value for the colour scale. You
 
 If you ask for mroe than one plot, you can specify, with the parameter `same`, whether the plots share the same objects (`same="objects"`), as above in the second example with two embeddings compared, or the same features (`same="features"`), as in the third examples, where we compared two samples. The default is `same="objects"`. Note that for same `same="objects"`, all the matrices in the first and second argument must have the same number of rows. For `same="features"`, the feature matrices in the second argument must have the same number of columns.
 
-The optional parameter `pointsize` allwos you to change the size of the points.
+The optional parameter `pointsize` allows you to change the size of the points.
 
 Finally, instead of opening the app in a browser, you can ask to **save everything to an HTML file**, by passing a file name in the optional `saveToFile` parameter. This file will then contaiin all your data and the sleepwalk app code (in JavaScript), so that you can view it in any web browser without needing to have an R session running. This can be useful to share your sleepwalk visualization with colleagues unfamiliar with R or to provide your embedding as an interactive supplement in a publication.
 
