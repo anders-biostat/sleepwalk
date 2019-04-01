@@ -1,3 +1,5 @@
+[![Travis Build Status](https://travis-ci.org/anders-biostat/sleepwalk.svg?branch=master)](https://travis-ci.org/anders-biostat/sleepwalk)
+
 # sleepwalk
 Exploring dimension-reduced embeddings
 
