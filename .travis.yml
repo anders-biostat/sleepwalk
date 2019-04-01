@@ -9,5 +9,3 @@ matrix:
   - r: devel
   - r: release
   - r: oldrel
-  - r: 3.2
-  - r: 3.1
