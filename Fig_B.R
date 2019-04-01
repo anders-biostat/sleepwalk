@@ -3,7 +3,7 @@ library(tidyverse)
 library(ggrepel)
 library(sleepwalk)
 
-load(file ="cite_data.rda")
+load(file ="data/cite_data.rda")
 
 features <- citeSeq$pca[, 1:citeSeq$ndims]
 vert <- (max(citeSeq$tsne[, 2]) - min(citeSeq$tsne[, 2]))/25
@@ -23,13 +23,13 @@ plotD <- getPlot(5618, 30)
 
 figB <- plot_grid(plotA, plotB, plotC, plotD, labels = c("a", "b", "c", "d"))
 
-png(filename = "../Fig_B.png", 
+png(filename = "figures/Fig_B.png", 
     width = 900, height = 1000)
 print(figB)
 dev.off()
 
-sleepwalk(citeSeq$tsne, features, 9, saveToFile = "../supplement/Fig_B.html")
-file <- readLines("../supplement/Fig_B.html")
+sleepwalk(citeSeq$tsne, features, 9, saveToFile = "supplement/src/Fig_B.html")
+file <- readLines("supplement/src/Fig_B.html")
 line <- which(grepl("^set_up_chart\\(", file))
 newFile <- c(file[1:(line - 1)], 
              "width = window.innerWidth/(n_charts + 1) * 0.9;",
@@ -42,4 +42,4 @@ newFile <- c(file[1:(line - 1)],
              '.attr("width", width)',
              '.attr("height", width + 75);',
              file[(line + 1):length(file)])
-writeLines(newFile, "../supplement/Fig_B.html")
+writeLines(newFile, "supplement/src/Fig_B.html")

@@ -4,7 +4,7 @@ library(Seurat)
 library(cowplot)
 library(tidyverse)
 
-e135 <- read_rds("e13_A.rds")
+e135 <- read_rds("data/e13_A.rds")
 
 e135 <- NormalizeData(e135)
 e135 <- FindVariableGenes(e135, do.plot = FALSE, y.cutoff = 0.5)
@@ -21,7 +21,7 @@ tsne <- Rtsne(pca$x, pca = F)
 library(uwot)
 um <- umap(pca$x, spread = 7)
 
-write_rds(um, "e13A_umap.rds", compress = "gz")
+write_rds(um, "data/e13A_umap.rds", compress = "gz")
 
 #used to draw arrows
 vert_tsne <- (max(tsne$Y[, 2]) - min(tsne$Y[, 2]))/25
@@ -42,15 +42,15 @@ figC <- plot_grid(snsh[[1]] + geom_segment(aes(x = tsne$Y[cell, 1] + hor_tsne, x
                                    colour = "red", arrow = arrow(length = unit(0.03, "npc"))),
           labels = c("a", "b"))
 
-png(filename = "../Fig_C.png", 
+png(filename = "figures/Fig_C.png", 
     width = 1000, height = 575)
 print(figC)
 dev.off()
 
-sleepwalk(list(tsne$Y, um), pca$x, pointSize = 2.5, saveToFile = "../supplement/Fig_C.html", titles = c("t-SNE", "UMAP"))
-file <- readLines("../supplement/Fig_C.html")
+sleepwalk(list(tsne$Y, um), pca$x, pointSize = 2.5, saveToFile = "supplement/src/Fig_C.html", titles = c("t-SNE", "UMAP"))
+file <- readLines("supplement/src/Fig_C.html")
 line <- which(grepl("^set_up_chart\\(", file))
 newFile <- c(file[1:(line - 1)], 
              "width = window.innerWidth/(n_charts) * 0.9;",
              file[line:length(file)])
-writeLines(newFile, "../supplement/Fig_C.html")
+writeLines(newFile, "supplement/src/Fig_C.html")

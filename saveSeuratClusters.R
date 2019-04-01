@@ -75,4 +75,4 @@ cbmc <- SetAssayData(cbmc, assay.type = "CITE", slot = "raw.data", new.data = cb
 cbmc <- NormalizeData(cbmc, assay.type = "CITE", normalization.method = "genesCLR")
 cbmc <- ScaleData(cbmc, assay.type = "CITE", display.progress = FALSE)
 
-save(cbmc, file = "cite_seurat.rda")
+save(cbmc, file = "data/cite_seurat.rda")

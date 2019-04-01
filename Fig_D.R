@@ -3,9 +3,9 @@ set.seed(1234)
 library(Seurat)
 library(tidyverse)
 
-e13_A <- read_rds("e13_A.rds")
-e13_B <- read_rds("e13_B.rds")
-e14 <- read_rds("e14_A.rds")
+e13_A <- read_rds("data/e13_A.rds")
+e13_B <- read_rds("data/e13_B.rds")
+e14 <- read_rds("data/e14_A.rds")
 
 normAndVargenes <- function(obj) {
   obj <- NormalizeData(obj)
@@ -28,7 +28,7 @@ getEmbedding <- function(data) {
   umap(pca$x, spread = 7)
 }
 
-um13_A <- read_rds("e13A_umap.rds") #use embedding from the figure C
+um13_A <- read_rds("data/e13A_umap.rds") #use embedding from the figure C
 um13_B <- getEmbedding(data13_B)
 um14 <- getEmbedding(data14)
 
@@ -114,23 +114,23 @@ figDsup <- plot_grid(
   plot_grid(plotlist = getGeneExpr(um13_B, data13_B, "E13.5_B"), nrow = 3),
   plot_grid(plotlist = getGeneExpr(um14, data14, "E14.5"), nrow = 3), ncol = 3)
 
-png(filename = "../Fig_D.png", 
+png(filename = "figures/Fig_D.png", 
     width = 1500, height = 575)
 print(figD)
 dev.off()
 
-png(filename = "../Fig_Dsup.png", 
+png(filename = "figures/Fig_Dsup.png", 
     width = 1500, height = 1500)
 print(figDsup)
 dev.off()
 
 
 sleepwalk(list(um13_A, um13_B, um14), list(comFeatures13_A, comFeatures13_B, comFeatures14), same = "features", pointSize = 2.5,
-          titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1, saveToFile = "../supplement/Fig_D.html")
+          titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1, saveToFile = "supplement/src/Fig_D.html")
 
-file <- readLines("../supplement/Fig_D.html")
+file <- readLines("supplement/src/Fig_D.html")
 line <- which(grepl("^set_up_chart\\(", file))
 newFile <- c(file[1:(line - 1)], 
              "width = window.innerWidth/(n_charts) * 0.9;",
              file[line:length(file)])
-writeLines(newFile, "../supplement/Fig_D.html")
+writeLines(newFile, "supplement/src/Fig_D.html")

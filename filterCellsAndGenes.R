@@ -34,7 +34,7 @@ saveAsRDS <-function(dir) {
 }
 
 #saveAsRDS("e11_A")
-saveAsRDS("e13_A")
-saveAsRDS("e13_B")
+saveAsRDS("data/e13_A")
+saveAsRDS("data/e13_B")
 #saveAsRDS("e15_A")
-saveAsRDS("e14_A")
+saveAsRDS("data/e14_A")

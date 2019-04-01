@@ -1,4 +1,4 @@
-load(file = "cite_data.rda")
+load(file = "data/cite_data.rda")
 
 library(tidyverse)
 
@@ -24,12 +24,12 @@ citeSeq$tsne %>%
     guides(colour = guide_legend(ncol = 4)) -> figA
 
 
-png(filename = "../Fig_A.png", 
+png(filename = "figures/Fig_A.png", 
     width = 500, height = 550)
 print(figA)
 dev.off()
 
-png(filename = "../supplement/Fig_A.png", 
+png(filename = "supplement/src/Fig_A.png", 
     width = 500, height = 575)
 print(figA)
 dev.off()

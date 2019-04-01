@@ -2,8 +2,8 @@
 <html>
 <head>
 	<title>Sleepwalk supplement</title>
-	<script type="text/javascript" src = "d3.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<script type="text/javascript" src = "src/d3.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="src/style.css">
 </head>
 <body>
 	<div id = "panel"></div>
@@ -121,7 +121,7 @@
 						.text(d => samples[d].title)
 						.on("click", function(d) {
 							d3.select("#frame")
-								.attr("src", samples[d].file);
+								.attr("src", "src/" + samples[d].file);
 							d3.select("#wrapper")
 								.style("max-width", samples[d].n * 550 + "px");
 							d3.select(".aspect-ratio")
