@@ -1,0 +1,6 @@
+^CRAN-RELEASE$
+^\.travis\.yml$
+Readme.md
+LICENSE
+test
+cran-comments.md

@@ -20,7 +20,7 @@
 #' 
 #' 
 #' @param embeddings either an \eqn{n x 2} embedding matrix (where \eqn{n} is a number of points) or
-#' a list of \eqn{n_i x 2} matices - one for each embedding. If \code{same = "objects"} all embedding
+#' a list of \eqn{n_i x 2} matrices - one for each embedding. If \code{same = "objects"} all embedding
 #' matrices must have the same number of rows.
 #' @param featureMatrices either an \eqn{n x m} matrix of point coordinates in the feature-dimension
 #' space or a list of such matrices - one for each embedding. The displayed distances will be calculated 
@@ -34,6 +34,8 @@
 #' If not provided, maximum distances will be estimated automatically as median value of the 
 #' distances.
 #' @param pointSize size of the points on the plots.
+#' @param titles a vector of titles for each embedding. Must be the same length as the list of 
+#' \code{embeddings}.
 #' @param distances distances (in feature space) between points that should be displayed as colours.
 #' This is an alternative to \code{featureMatrices} if \code{same = "objects"}.
 #' @param same defines what kind of distances to show; must be either \code{"objects"} or \code{"features"}.
@@ -45,17 +47,53 @@
 #' is used to compare different sets of points (e.g. samples from different patients, or different batches) 
 #' in the same feature space. In this case the distance is calculated from the selected point to all other 
 #' points (including those in other embeddings).
+#' @param compare defines what kind of comparison to perform; must be either \code{"embeddings"} or
+#' \code{"distances"}. If \code{compare == "embeddings"}, then in each of the displayed embeddings
+#' all the points will be coloured the same way, even if different feature or distance matrices are provided. 
+#' This allows one to immediately identify the corresponding points and neighbourhoods in each of the embeddings.
+#' If \code{commpare == "distances"}, point colours for each embedding are calculated independently. This allows, 
+#' for instance, to compare different metrics or show an additional layer of information, when exploring an
+#' embedding. This parameter has no effect if \compare{same == "features"}.
+#' @param ncol number of columns in the table, where all the embeddings are placed.
+#' @param nrow number of rows in the table, where all the embeddings are placed.
 #' @param saveToFile path to the .html file where to save the plots. The resulting page will be fully interactive
 #' and contain all the data. If this is \code{NULL}, than the plots will be shown as the web page in your 
 #' default browser. Note, that if you try to save that page, using your browser's functionality,
 #' it'll become static.
 #' 
-#' 
 #' @return None.
 #' 
 #' @author Simon Anders, Svetlana Ovchinnikova
+#'
+#' @examples 
+#' #generate cockscrew-shaped 3D data with 3 additional noisy dimensions
+#' ts <- c(rnorm(100), rnorm(200, 5), rnorm(150, 13), runif(200, min = -5, max = 20))
 #' 
+#' a <- 3
+#' w <- 1
+#' 
+#' points <- cbind(30*cos(w * ts), 30*sin(w * ts), a * ts)
+#' 
+#' ndim <- 6
+#' noise <- cbind(matrix(rnorm(length(ts) * 3, sd = 5), ncol = 3),
+#'                matrix(rnorm(length(ts) * (ndim - 3), sd = 10), ncol = ndim - 3))
+#' 
+#' data <- noise
+#' data[, 1:3] <- data[, 1:3] + points
+#' 
+#' pca <- prcomp(data)
+#' 
+#' \donttest{#compare Euclidean distance with the real position on the helix
+#' sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)), 
+#'           compare = "distances", pointSize = 3)}
+#' #the same, but with saving the web page to an HTML file
+#' sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)), 
+#'           compare = "distances", pointSize = 3,
+#'           saveToFile = "test.html")
+#' 
+#'   
 #' @importFrom jsonlite toJSON
+#' @import jrc
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
                        distances = NULL, same = c( "objects", "features" ), compare = c("embeddings", "distances"),
@@ -137,7 +175,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
         message(paste0("Estimating 'maxdist' for feature matrix "), i)
         pairs <- cbind(sample(nrow(featureMatrices[[i]]), 1500, TRUE), 
                        sample(nrow(featureMatrices[[i]]), 1500, TRUE))
-        median(sqrt(rowSums((featureMatrices[[i]][pairs[, 1], ] - featureMatrices[[i]][pairs[, 2], ])^2))) 
+        median(sqrt(rowSums((featureMatrices[[i]][pairs[, 1], , drop = FALSE] - featureMatrices[[i]][pairs[, 2], , drop = FALSE])^2))) 
       })
     } else {
       maxdists <- sapply(distances, median)
@@ -153,29 +191,29 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   }
   
   if(is.null(saveToFile)) {
-    JsRCom::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk.html" )
+    jrc::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk.html" )
     
     if( same == "objects" ) 
-      JsRCom::sendData( "mode", "A" )
+      jrc::sendData( "mode", "A" )
     else
-      JsRCom::sendData( "mode", "B" )
+      jrc::sendData( "mode", "B" )
     
-    JsRCom::sendData( "n_charts", length(embeddings) )
-    JsRCom::sendData( "titles", titles, TRUE )
-    JsRCom::sendData( "maxdist", maxdists, TRUE )
-    JsRCom::sendData( "embedding", embeddings, TRUE )
+    jrc::sendData( "n_charts", length(embeddings) )
+    jrc::sendData( "titles", titles, TRUE )
+    jrc::sendData( "maxdist", maxdists, TRUE )
+    jrc::sendData( "embedding", embeddings, TRUE )
     if(!is.null(featureMatrices)) {
-      JsRCom::sendData( "featureMatrix", featureMatrices, TRUE )
+      jrc::sendData( "featureMatrix", featureMatrices, TRUE )
     } else {
-      JsRCom::sendData( "distance", distances, TRUE )
+      jrc::sendData( "distance", distances, TRUE )
     }
-    JsRCom::sendData( "pointSize", pointSize )
+    jrc::sendData( "pointSize", pointSize )
     if(!is.null(ncol))
-      JsRCom::sendData( "ncol", ncol )
+      jrc::sendData( "ncol", ncol )
     if(!is.null(nrow))
-      JsRCom::sendData( "nrow", nrow )
-    JsRCom::sendData( "compare", compare )
-    JsRCom::sendCommand( "set_up_chart()" )
+      jrc::sendData( "nrow", nrow )
+    jrc::sendData( "compare", compare )
+    jrc::sendCommand( "set_up_chart()" )
   } else {
     content <- readLines(paste0(system.file( package="sleepwalk" ), "/", "sleepwalk.html"), warn = F)
     
@@ -227,6 +265,21 @@ slw_on_selection <- function(points, emb) {
                  "the embedding, where they were selected."))
 }
 
+#' Make a snapshot of the currently running Sleepwalk app
+#' 
+#' This function produces a static plot that shows a given state of the 
+#' currently active Sleepwalk app. Double click on a point in the web browser
+#' will generate a command that can reproduce this exact state of the app.
+#' 
+#' @param point an index of the focus point (i.e. the one, over which the mouse is hovering at the moment).
+#' To learn the index of a point double click on it in the web browser.
+#' @param emb an index of the embedding of the focus point. To learn the index of an embedding double click 
+#' on any of its points in the web browser.
+#' @param returnList if \code{TRUE} returns a list of \code{ggplot} objects (one per embedding), that can be easily 
+#' modified later. Otherwise returns a single \code{ggplot} objects with all the embeddings.
+#' 
+#' @return a \code{ggplot} object or a list of \code{ggplot} objects.
+#' 
 #' @importFrom httpuv service
 #' @import ggplot2
 #' @importFrom scales squish
@@ -246,9 +299,9 @@ slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
   }
   
   en <- new.env()
-  JsRCom::setEnvironment(en)
+  jrc::setEnvironment(en)
   en$finished <- 0
-  JsRCom::sendCommand(paste0("getSnapshotData(", point - 1, ", ", emb - 1, ");"))
+  jrc::sendCommand(paste0("getSnapshotData(", point - 1, ", ", emb - 1, ");"))
 
   for( i in 1:(10/0.05) ) {
     service(100)
@@ -258,7 +311,7 @@ slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
     Sys.sleep( .05 )
   }
   
-  JsRCom::setEnvironment(globalenv())
+  jrc::setEnvironment(globalenv())
   
   if( en$finished == 0 )
     stop( "Failed to get embedding data from the server" )

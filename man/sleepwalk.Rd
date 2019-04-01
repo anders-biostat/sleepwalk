@@ -5,12 +5,13 @@
 \title{Interactively explore one or several 2D embeddings}
 \usage{
 sleepwalk(embeddings, featureMatrices = NULL, maxdists = NULL,
-  pointSize = 1.5, distances = NULL, same = c("objects", "features"),
-  saveToFile = NULL)
+  pointSize = 1.5, titles = NULL, distances = NULL,
+  same = c("objects", "features"), compare = c("embeddings",
+  "distances"), saveToFile = NULL, ncol = NULL, nrow = NULL)
 }
 \arguments{
 \item{embeddings}{either an \eqn{n x 2} embedding matrix (where \eqn{n} is a number of points) or
-a list of \eqn{n_i x 2} matices - one for each embedding. If \code{same = "objects"} all embedding
+a list of \eqn{n_i x 2} matrices - one for each embedding. If \code{same = "objects"} all embedding
 matrices must have the same number of rows.}
 
 \item{featureMatrices}{either an \eqn{n x m} matrix of point coordinates in the feature-dimension
@@ -28,6 +29,9 @@ distances.}
 
 \item{pointSize}{size of the points on the plots.}
 
+\item{titles}{a vector of titles for each embedding. Must be the same length as the list of 
+\code{embeddings}.}
+
 \item{distances}{distances (in feature space) between points that should be displayed as colours.
 This is an alternative to \code{featureMatrices} if \code{same = "objects"}.}
 
@@ -41,10 +45,22 @@ is used to compare different sets of points (e.g. samples from different patient
 in the same feature space. In this case the distance is calculated from the selected point to all other 
 points (including those in other embeddings).}
 
+\item{compare}{defines what kind of comparison to perform; must be either \code{"embeddings"} or
+\code{"distances"}. If \code{compare == "embeddings"}, then in each of the displayed embeddings
+all the points will be coloured the same way, even if different feature or distance matrices are provided. 
+This allows one to immediately identify the corresponding points and neighbourhoods in each of the embeddings.
+If \code{commpare == "distances"}, point colours for each embedding are calculated independently. This allows, 
+for instance, to compare different metrics or show an additional layer of information, when exploring an
+embedding. This parameter has no effect if \compare{same == "features"}.}
+
 \item{saveToFile}{path to the .html file where to save the plots. The resulting page will be fully interactive
 and contain all the data. If this is \code{NULL}, than the plots will be shown as the web page in your 
 default browser. Note, that if you try to save that page, using your browser's functionality,
 it'll become static.}
+
+\item{ncol}{number of columns in the table, where all the embeddings are placed.}
+
+\item{nrow}{number of rows in the table, where all the embeddings are placed.}
 }
 \value{
 None.
@@ -60,6 +76,34 @@ that their colour indicates
 the feature-space distance to the point under the mouse cursor. This allows to quickly and
 intuitively check how tight clusters are, how faithful the embedding is, and how similar
 the clusters are to each other.
+}
+\examples{
+#generate cockscrew-shaped 3D data with 3 additional noisy dimensions
+ts <- c(rnorm(100), rnorm(200, 5), rnorm(150, 13), runif(200, min = -5, max = 20))
+
+a <- 3
+w <- 1
+
+points <- cbind(30*cos(w * ts), 30*sin(w * ts), a * ts)
+
+ndim <- 6
+noise <- cbind(matrix(rnorm(length(ts) * 3, sd = 5), ncol = 3),
+               matrix(rnorm(length(ts) * (ndim - 3), sd = 10), ncol = ndim - 3))
+
+data <- noise
+data[, 1:3] <- data[, 1:3] + points
+
+pca <- prcomp(data)
+
+\donttest{#compare Euclidean distance with the real position on the helix
+sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)), 
+          compare = "distances", pointSize = 3)}
+#the same, but with saving the web page to an HTML file
+sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)), 
+          compare = "distances", pointSize = 3,
+          saveToFile = "test.html")
+
+  
 }
 \author{
 Simon Anders, Svetlana Ovchinnikova
