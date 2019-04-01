@@ -51,7 +51,7 @@ all the points will be coloured the same way, even if different feature or dista
 This allows one to immediately identify the corresponding points and neighbourhoods in each of the embeddings.
 If \code{commpare == "distances"}, point colours for each embedding are calculated independently. This allows, 
 for instance, to compare different metrics or show an additional layer of information, when exploring an
-embedding. This parameter has no effect if \compare{same == "features"}.}
+embedding. This parameter has no effect if \code{same == "features"}.}
 
 \item{saveToFile}{path to the .html file where to save the plots. The resulting page will be fully interactive
 and contain all the data. If this is \code{NULL}, than the plots will be shown as the web page in your 

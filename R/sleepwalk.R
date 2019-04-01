@@ -53,7 +53,7 @@
 #' This allows one to immediately identify the corresponding points and neighbourhoods in each of the embeddings.
 #' If \code{commpare == "distances"}, point colours for each embedding are calculated independently. This allows, 
 #' for instance, to compare different metrics or show an additional layer of information, when exploring an
-#' embedding. This parameter has no effect if \compare{same == "features"}.
+#' embedding. This parameter has no effect if \code{same == "features"}.
 #' @param ncol number of columns in the table, where all the embeddings are placed.
 #' @param nrow number of rows in the table, where all the embeddings are placed.
 #' @param saveToFile path to the .html file where to save the plots. The resulting page will be fully interactive
@@ -93,6 +93,7 @@
 #' 
 #'   
 #' @importFrom jsonlite toJSON
+#' @importFrom stats median
 #' @import jrc
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
@@ -279,6 +280,10 @@ slw_on_selection <- function(points, emb) {
 #' modified later. Otherwise returns a single \code{ggplot} objects with all the embeddings.
 #' 
 #' @return a \code{ggplot} object or a list of \code{ggplot} objects.
+#' @examples 
+#' \donttest{data("iris")
+#' sleepwalk(iris[, c(1,3)], iris[1:4], pointSize = 4)
+#' slw_snapshot(10)}
 #' 
 #' @importFrom httpuv service
 #' @import ggplot2
@@ -327,7 +332,7 @@ slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
   if(n_charts == 1) {
     data <- as.data.frame(cbind(en$embs[1, , ], en$dists[1, ]))
     colnames(data) <- c("x1", "x2", "dists")
-    ggplot(data) + geom_point(aes(x = x1, y = x2, colour = dists), size = en$pointSize/2) +
+    ggplot() + geom_point(aes(x = data$x1, y = data$x2, colour = data$dists), size = en$pointSize/2) +
       scale_color_gradientn(colours = colours, limits = c(0, maxdists), oob = squish) +
       ggtitle(en$titles) +
       theme(axis.title = element_blank(), axis.line = element_blank(), panel.grid.major = element_blank(),
@@ -354,7 +359,7 @@ slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
           md <- maxdists[i]
         }
       }
-      plots[[i]] <-     ggplot(data) + geom_point(aes(x = x1, y = x2, colour = dists), size = en$pointSize/2) +
+      plots[[i]] <- ggplot() + geom_point(aes(x = data$x1, y = data$x2, colour = data$dists), size = en$pointSize/2) +
         scale_color_gradientn(colours = colours, limits = c(0, md), oob = squish) +
         ggtitle(en$titles[i]) +
         theme(axis.title = element_blank(), axis.line = element_blank(), panel.grid.major = element_blank(),

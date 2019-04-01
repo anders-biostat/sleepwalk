@@ -24,3 +24,9 @@ This function produces a static plot that shows a given state of the
 currently active Sleepwalk app. Double click on a point in the web browser
 will generate a command that can reproduce this exact state of the app.
 }
+\examples{
+\donttest{data("iris")
+sleepwalk(iris[, c(1,3)], iris[1:4], pointSize = 4)
+slw_snapshot(10)}
+
+}
