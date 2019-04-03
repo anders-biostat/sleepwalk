@@ -7,12 +7,21 @@
 
 There were no ERRORS, WARNINGS or NOTES
 
-## check_rhub results
+## Resubmission
 
-There wer no ERRORS or WARNINGS, and 1 NOTE
+* DESCRIPTION changed
 
-Possibly mis-spelled words in DESCRIPTION:
-  Embeddings (3:48)
-  embeddings (12:3)
+* slw_on_selection is no longer an exported function. Instead a 
+	variable to store the apps state is exported (.slw).
 
-However, the spelling is correct
+* an HTML filed created in the example is now saved to tempdir(),
+	sleepwalk function doesn't save any files by default.
+
+* We've just submitted the related paper, and therefore no reference can be provided at the
+	moment.
+
+>> Please provide executable examples in slw_on_selection.Rd and unwrap /donttest in slw_snapshot.Rd
+Unfortunately, slw_snapshot requires an esteblished WebSocket connection with an opened web page, 
+which is impossible during the automated testing. If there is no currently running Sleepwalk page,
+the function will wait for 10 seconds and produce an error "Failed to get embedding data from the server".
+
