@@ -9,8 +9,10 @@ Authors@R: c(
     person( "Simon", "Anders", role="aut", 
        email = "sanders@fs.tum.de" ) )
 Description: A tool to interactively explore the
-  embeddings created by dimension reduction methods such as 'PCA', 'MDS', 
-  't-SNE' or 'UMAP'.
+  embeddings created by dimension reduction methods such as 
+  Principal Components Analysis (PCA), Multidimensional Scaling (MDS), 
+  T-distributed Stochastic Neighbour Embedding (t-SNE),
+  Uniform Manifold Approximation and Projection (UMAP) or any other.
 License: GPL-3
 Imports: jrc, cowplot, httpuv, jsonlite, scales, ggplot2
 RoxygenNote: 6.1.1

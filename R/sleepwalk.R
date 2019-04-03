@@ -65,7 +65,7 @@
 #' default browser. Note, that if you try to save that page, using your browser's functionality,
 #' it'll become static.
 #' @param on_selection a callback function that is called every time the user selects a group of points in
-#' the web browser. From the \colde{sleepwalk} app it gets two arguments: The first one is a vector of indices of
+#' the web browser. From the \code{sleepwalk} app it gets two arguments: The first one is a vector of indices of
 #' all the selected points and the second one is an index of an embedding from where the points were selected.
 #' 
 #' @return None.
@@ -121,7 +121,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   
   rm(list = ls(envir = .slw), envir = .slw)
   if(is.null(on_selection)) {
-    .slw$on_selection <- function() {
+    .slw$on_selection <- function(points, emb) {
       message(paste0("You've selected ", length(points), " points from the embedding ", emb, "."))
       message(paste0("The indices of the selected points are now stored in the variable 'selPoints'."))
     }

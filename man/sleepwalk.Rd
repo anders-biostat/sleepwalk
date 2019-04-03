@@ -64,7 +64,7 @@ it'll become static.}
 \item{nrow}{number of rows in the table, where all the embeddings are placed.}
 
 \item{on_selection}{a callback function that is called every time the user selects a group of points in
-the web browser. From the \colde{sleepwalk} app it gets two arguments: The first one is a vector of indices of
+the web browser. From the \code{sleepwalk} app it gets two arguments: The first one is a vector of indices of
 all the selected points and the second one is an index of an embedding from where the points were selected.}
 }
 \value{
