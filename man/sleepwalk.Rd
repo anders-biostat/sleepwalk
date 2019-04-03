@@ -7,7 +7,8 @@
 sleepwalk(embeddings, featureMatrices = NULL, maxdists = NULL,
   pointSize = 1.5, titles = NULL, distances = NULL,
   same = c("objects", "features"), compare = c("embeddings",
-  "distances"), saveToFile = NULL, ncol = NULL, nrow = NULL)
+  "distances"), saveToFile = NULL, ncol = NULL, nrow = NULL,
+  on_selection = NULL)
 }
 \arguments{
 \item{embeddings}{either an \eqn{n x 2} embedding matrix (where \eqn{n} is a number of points) or
@@ -61,6 +62,10 @@ it'll become static.}
 \item{ncol}{number of columns in the table, where all the embeddings are placed.}
 
 \item{nrow}{number of rows in the table, where all the embeddings are placed.}
+
+\item{on_selection}{a callback function that is called every time the user selects a group of points in
+the web browser. From the \colde{sleepwalk} app it gets two arguments: The first one is a vector of indices of
+all the selected points and the second one is an index of an embedding from where the points were selected.}
 }
 \value{
 None.
@@ -101,7 +106,7 @@ sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)),
 #the same, but with saving the web page to an HTML file
 sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)), 
           compare = "distances", pointSize = 3,
-          saveToFile = "test.html")
+          saveToFile = paste0(tempdir(), "/test.html"))
 
   
 }

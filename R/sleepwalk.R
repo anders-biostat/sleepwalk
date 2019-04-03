@@ -6,6 +6,10 @@
   }
 }
 
+#' Variable to store the information about the current \code{sleepwalk} session.
+#' @export
+.slw <- new.env()
+
 #' Interactively explore one or several 2D embeddings
 #' 
 #' A function to interactively explore a 2D embedding of some higher-dimensional
@@ -60,6 +64,9 @@
 #' and contain all the data. If this is \code{NULL}, than the plots will be shown as the web page in your 
 #' default browser. Note, that if you try to save that page, using your browser's functionality,
 #' it'll become static.
+#' @param on_selection a callback function that is called every time the user selects a group of points in
+#' the web browser. From the \colde{sleepwalk} app it gets two arguments: The first one is a vector of indices of
+#' all the selected points and the second one is an index of an embedding from where the points were selected.
 #' 
 #' @return None.
 #' 
@@ -89,7 +96,7 @@
 #' #the same, but with saving the web page to an HTML file
 #' sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)), 
 #'           compare = "distances", pointSize = 3,
-#'           saveToFile = "test.html")
+#'           saveToFile = paste0(tempdir(), "/test.html"))
 #' 
 #'   
 #' @importFrom jsonlite toJSON
@@ -98,7 +105,7 @@
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
                        distances = NULL, same = c( "objects", "features" ), compare = c("embeddings", "distances"),
-                       saveToFile = NULL, ncol = NULL, nrow = NULL) {
+                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL) {
   same = match.arg( same )
   compare = match.arg( compare )
   
@@ -111,6 +118,16 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   }
   
   stopifnot( is.numeric(pointSize) && length(pointSize) == 1 )
+  
+  rm(list = ls(envir = .slw), envir = .slw)
+  if(is.null(on_selection)) {
+    .slw$on_selection <- function() {
+      message(paste0("You've selected ", length(points), " points from the embedding ", emb, "."))
+      message(paste0("The indices of the selected points are now stored in the variable 'selPoints'."))
+    }
+  } else {
+    .slw$on_selection <- on_selection
+  }
   
   #if there is only one embedding
   if(!is.null(dim(embeddings))) 
@@ -247,23 +264,6 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     
     writeLines(content, saveToFile)
   }
-}
-
-#' On selection
-#' 
-#' This function is called each time any points are selected or deselected.
-#' You can customise it by redefining.
-#' 
-#' @param points a vector of indices of the selected points.
-#' @param emb an index of the embedding, where the points have been selected.
-#' 
-#' @export
-slw_on_selection <- function(points, emb) {
-  message(paste0("You've selected ", length(points), " points from the embedding ", emb, "."))
-  message(paste0("The indices of the selected points are now stored in the variable 'selPoints'."))
-  message(paste0("You can also redefine this function 'slw_on_selection' that is called each time any points are selected."))
-  message(paste0("It's first argument is a vector of indices of all the selected points, and the second one is the index of ",
-                 "the embedding, where they were selected."))
 }
 
 #' Make a snapshot of the currently running Sleepwalk app
