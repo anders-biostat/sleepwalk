@@ -126,7 +126,17 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
       message(paste0("The indices of the selected points are now stored in the variable 'selPoints'."))
     }
   } else {
-    .slw$on_selection <- on_selection
+    stopifnot(is.function(on_selection))
+    
+    n_args <- length(formals(on_selection))
+    stopifnot(n_args < 3)
+    
+    .slw$on_selection <- function(points, emb) {
+      if(n_args == 0) on_selection()
+      if(n_args == 1) on_selection(points)
+      if(n_args == 2) on_selection(points, emb)
+    }
+      on_selection
   }
   
   #if there is only one embedding
