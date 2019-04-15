@@ -76,12 +76,10 @@ Here, our goal is to figure out if there are corresponding groups of cells in th
 
 # Installation
 
-To install `sleepwalk`, start R and type
+Sleepwalk is available on [CRAN](https://cran.r-project.org/) and can be installed like any other CRAN package, with
 
 ```r
-install.packages( "devtools" )
-devtools::install_github( "anders-biostat/JsRCom" )
-devtools::install_github( "anders-biostat/sleepwalk" )
+install.packages( "sleepwalk" )
 ```
 
 # Usage
@@ -120,6 +118,13 @@ This takes the t-SNE embeddinng stored in the Seurat data object `seu` and displ
 
 Sleepwalk is being developed by [Svetlana Ovchinnikova](mailto:s.ovchinnikova@zmbh.uni-heidelberg.de) and [Simon Anders](mailto:s.anders@zmbh.uni-heidelberg.de) at the [Center for Molecular Biology of the University of Heidelberg](https://www.zmbh.uni-heidelberg.de/anders). Please contact us for questions or feedback, or file an [issue](https://github.com/anders-biostat/sleepwalk/issues) on GitHub if you find a bug.
 
+# Preprint
+
+A preprint describing Sleepwalk in more detail is available at BioRxiv:
+
+S. Ovchinnikova and S. Anders: *Exploring dimension-reduced embeddings with Sleepwalk.* BioRvix 603589 (2019). [doi:10.1101/603589](https://doi.org/10.1101/603589).
+
+Please cite this paper if you use Sleepwalk in your research work.
 
 <!-- Default Statcounter code for anders-biostat.github.io
 https://anders-biostat.github.io -->
