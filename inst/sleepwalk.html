@@ -242,7 +242,7 @@ set_up_chart = function() {
 
                      if(jrc) {
                         jrc.sendData("selPoints", selInds.map(el => el + 1));
-                        jrc.sendCommand(".slw$on_selection(selPoints, " + (+ch + 1) +")");
+                        jrc.sendCommand("sleepwalk::.slw$on_selection(selPoints, " + (+ch + 1) +")");
                      }
                      
                   }
