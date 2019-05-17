@@ -349,8 +349,7 @@ slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
             axis.text = element_blank(), axis.ticks = element_blank(), panel.grid.minor = element_blank(),
             legend.position = "bottom", legend.title = element_blank()) + guides(colour = guide_colourbar(barwidth = 15, barheight = 0.5))
   } else {
-    plots <- list()
-    for(i in 1:n_charts) {
+    plots <- lapply(1:n_charts, function(i) {
       if(is.list(en$embs)) {
         data <- as.data.frame(en$embs[[i]])
       } else {
@@ -369,13 +368,13 @@ slw_snapshot <- function(point, emb = 1, returnList = FALSE) {
           md <- maxdists[i]
         }
       }
-      plots[[i]] <- ggplot() + geom_point(aes(x = data$x1, y = data$x2, colour = data$dists), size = en$pointSize/2) +
+      ggplot() + geom_point(aes(x = data$x1, y = data$x2, colour = data$dists), size = en$pointSize/2) +
         scale_color_gradientn(colours = colours, limits = c(0, md), oob = squish) +
         ggtitle(en$titles[i]) +
         theme(axis.title = element_blank(), axis.line = element_blank(), panel.grid.major = element_blank(),
               axis.text = element_blank(), axis.ticks = element_blank(), panel.grid.minor = element_blank(),
               legend.position = "bottom", legend.title = element_blank()) + guides(colour = guide_colourbar(barwidth = 15, barheight = 0.5))
-    }
+    })
     if(returnList) {
       plots
     } else {
