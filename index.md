@@ -104,13 +104,21 @@ Finally, instead of opening the app in a browser, you can ask to **save everythi
 
 # For Seurat users
 
-If you have a Seurat data object, and have already run Seurat's `RunPCA` and `RunTSNE` functions on it, then you can use Sleepwalk simply by executing
+If you have a Seurat data object, and have already run Seurat's `RunPCA` and `RunTSNE` functions on it, then you can use Sleepwalk simply by executing the following command.
+
+for Seurat version 2.x:
 
 ```
 sleepwalk( seu@dr$tsne@cell.embeddings, seu@dr$pca@cell.embeddings )
 ```
 
-This takes the t-SNE embeddinng stored in the Seurat data object `seu` and displays it with t-SNE. 
+for Seurat version 3.x:
+
+```
+sleepwalk( seu$tsne@cell.embeddings, seu$pca@cell.embeddings )
+```
+
+This takes the t-SNE embedding stored in the Seurat data object `seu` and displays it with t-SNE. Replace `tsne` with `umap` in case you have used `RunUMAP` instead of `RunTSNE`.
 
 (Note: The feature-space distances are calculated from the PCA coordinates, as this is what the t-SNE function gets by default. It is, of course, more accurate to pass as second parameter not the principal components buts the full data, and to do so, replace `seu@dr$pca@cell.embeddings` with `seu@data`. However, `data` is a huge matrix, and Sleepwalk might become quite slow.)
 
