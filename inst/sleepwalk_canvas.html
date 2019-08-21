@@ -1,0 +1,579 @@
+<html>
+  
+<head>
+<title>Sleepwalk</title>
+<style>
+   .lasso path {
+       stroke: rgb(80,80,80);
+       stroke-width:2px;
+   }
+
+   .lasso .drawn {
+       fill-opacity:.05 ;
+   }
+
+   .lasso .loop_close {
+       fill:none;
+       stroke-dasharray: 4,4;
+   }
+
+   .lasso .origin {
+       fill:#3399FF;
+       fill-opacity:.5;
+   }
+
+   .not_selected {
+       fill: #aaa;
+       opacity: 0.5;
+   }   
+
+   #embeddings td {
+       border: LightGray solid 1px;
+       padding: 10px;
+   }
+</style>
+</head>
+
+<body>
+
+<table id="embeddings">
+</table>
+
+<script src="d3.v5.min.js"></script>
+<script src="lasso.js"></script>
+
+<script>
+deeprange = function(a) {
+   var min = Infinity
+   var max = -Infinity
+   for( var i = 0; i < a.length; i++ ) {
+      var x = a[i]
+      var r
+      if( Array.isArray(x) )
+         r = deeprange( x )
+      else
+         r = [ x, x ]
+      if( r[0] < min )
+         min = r[0]
+      if( r[1] > max )
+         max = r[1]
+   }
+   return [ min, max ]
+}
+</script>
+
+<script>
+
+width = 500;
+
+n_charts = 2;
+
+//"A" - same objects
+//"B" - same features
+mode = "A";
+
+pointSize = 1.5;
+
+titles = [];
+
+featureMatrix = undefined;
+distance = undefined;
+
+var centerCell = [0, 0], xDomain, yDomain, ncol, nrow,
+  bgColour = d3.interpolateCubehelixDefault(0.8), time;
+
+set_up_chart = function() {
+
+  addSVGs(n_charts, ncol, nrow);
+  var pacer = call_pacer(150);
+
+  colourScales = [];
+  axisScales = [];
+  embeddingScales = [];
+  colours = [];
+  quadtrees = [];
+
+  //this is to allow independent change in scales even for
+  //"features" mode. May be changed later.
+  maxdist.length == n_charts ? 
+    scaleDist = maxdist.slice() :
+    scaleDist = d3.range(n_charts).map(e => maxdist[0]);
+
+  if( featureMatrix && embedding.length != featureMatrix.length )
+    for(var i = 1; i < embedding.length; i++ )
+      featureMatrix[i] = featureMatrix[0];
+
+  if( distance && embedding.length != distance.length )
+    for(var i = 1; i < embedding.length; i++ )
+      distance[i] = distance[0];
+
+  for( var ch = 0; ch < n_charts; ch++ ) {
+    //define all the scales     
+    setColourScale(ch); // distance -> colour
+    setAxisScale(ch); // distance -> position of the legend axis
+    setEmbeddingScales(ch); //embedding coordinates -> position on the plot
+    colours[ch] = embedding[ch].map(el => "gray"); //initial colour
+    quadtrees[ch] = d3.quadtree()
+      .extent([-1, -1], [width + 1, width + 1])
+      .x(function(ch) {return d => embeddingScales[ch].x(d[0])} (ch))
+      .y(function(ch) {return d => embeddingScales[ch].y(d[1])} (ch))
+      .addAll(embedding[ch].map((el, i) => el.concat(i)));
+
+    //define colour gradient for the legend
+    d3.select("#chart" + ch)
+      .append("defs")
+        .append("linearGradient")
+          .attr("id", "colourLegend")
+          .attr("x1", "0%")
+          .attr("x2", "100%")
+          .attr("y1", "0%")
+          .attr("y2", "0%");
+
+    //group of all legend related elements
+    var legend = d3.select("#chart" + ch)
+      .attr( "width", width )
+      .attr( "height", +width + 75) //75px for the colour legend and title
+        .append("g")
+          .attr("class", "legend")
+          .attr("transform", "translate(15, " + (width + 20) + ")");
+
+    //here goes the axis
+    legend
+      .append("g") 
+        .attr("class", "axis")
+        .attr("transform", "translate(0, 20)");
+
+    //this is the colour gradient
+    legend
+      .append("rect")
+        .attr("width", d3.max([width - 40, 0]))
+        .attr("height", 10)
+        .attr("y", 20)
+        .attr("fill", "url(#colourLegend)");
+
+    //fill all the legend elements
+    updateColour(ch);
+
+    //and buttons to change the colour scales
+    var buttons = legend.append("g")
+      .attr("class", "buttons")
+      .attr("transform", "translate(" + d3.max([width - 70, 0]) + ", 35)")
+      .selectAll(".button").data(["-", "+"].map(e => [e, ch])) //we'll keep the chart number in the data
+        .enter()
+          .append("g")
+            .attr("class", "button")
+            .attr("transform", (d, i) => "translate(" + (i * 30) + ", 0)")
+            .on("click", function(d) {
+              if(d[0] == "+")
+                scaleDist[d[1]] *= Math.sqrt(2);
+              if(d[0] == "-")
+                scaleDist[d[1]] /= Math.sqrt(2);
+
+              setColourScale(d[1]);
+              setAxisScale(d[1]);
+              updateColour(d[1]);
+              window["new_center_cell_" + mode]();
+            });
+    buttons
+      .append("rect")
+        .attr("width", 25) //this is used only once, so keep all the styling here
+        .attr("height", 15)
+        .attr("fill", "#aaa")
+        .style("font-weight", "bold");
+
+    buttons
+      .append("text")
+        .text(d => d[0])
+          .attr("x", 11)
+          .attr("y", 11)
+          .attr("size", 13)
+          .style("cursor", "default");
+
+    //add titles
+    if(titles.length > 0) {
+      d3.select("#chart" + ch)
+        .append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + width/2 + ", 15)")
+          .style("font-family", "Calibri")
+          .style("font-weight", "bold")
+          .text(titles[ch]);
+    }
+
+    drawPoints(ch);
+    
+    d3.select("#points" + ch)
+      .on("mousemove", function(ch) {
+        var timer;
+        return function() {
+          var pos = d3.mouse(this);
+          pacer.do(function() {fireClosest(ch, pos)});
+//          timer = d3.timeout(function() {fireClosest(ch, pos)}, 250);
+//          var ind = colToInd(hiddenCanvases[ch].getContext("2d").getImageData(pos[0], pos[1], 1, 1));
+//          if(ind != 0){
+//            ind--;
+//            if(Math.abs(embeddingScales[ch].x(embedding[ch][ind][0]) - pos[0]) < d3.max([2, pointSize]) && 
+//                Math.abs(embeddingScales[ch].y(embedding[ch][ind][1]) - pos[1]) < d3.max([2, pointSize]) &&
+//                (centerCell[0] != ch || centerCell[1] != ind)) {
+//              timer.stop();
+//              console.log("timer stopped");
+//              centerCell = [ch, ind];
+//              (function() {pacer.do(window["new_center_cell_" + mode])}) ();
+//            }
+//          }
+        }
+      } (ch) );
+    
+
+    d3.select("#chart" + ch)
+      .on("mousemove", function(d) {
+        d3.select(this.parentNode)
+          .select("canvas").node()
+          .dispatchEvent(new MouseEvent(d3.event.type, d3.event));
+      })
+      .call(function(ch) {
+        var lasso = d3.lasso()
+          .items(embedding[ch].map(function(el) {
+            return {x: embeddingScales[ch].x(el[0]),
+                    y: embeddingScales[ch].y(el[1])}
+          }))
+          .closePathDistance(75)
+          .area(d3.select("#chart" + ch))
+          .on("end", function() {
+            lasso.items().forEach(function(el, i) {
+              embedding[ch][i].blocked = !el.selected;
+            });
+            drawPoints(ch);
+          })
+          .on("start", function() {
+//            var container;
+//            if(mode == "A")
+//              container = d3.select("#embeddings")
+//            else
+//              container = d3.select("#chart" + ch);
+
+//            container.selectAll(".point")
+//              .classed("not_selected", false);
+          });
+        return lasso;
+      }(ch));
+
+
+   }
+}
+
+var colourScheme = function(d) {
+  return d3.interpolateCubehelixDefault(d * 0.8);
+}
+
+var setColourScale = function(chart) {
+  colourScales[chart] = d3.scaleSequential(colourScheme)
+    .domain([0, scaleDist[chart]])
+    .clamp(true);
+}
+
+var setAxisScale = function(chart) {
+  axisScales[chart] = d3.scaleLinear()
+    .domain([0, scaleDist[chart]])
+    .range([0, d3.max([width - 40, 0])])
+    .nice();
+}
+
+var setEmbeddingScales = function(chart) {
+  if(mode == "A") {
+    xDomain = d3.extent(embedding[chart].map(e => e[0]));
+    yDomain = d3.extent(embedding[chart].map(e => e[1]));
+  }
+
+  if(mode == "B" && xDomain == undefined) {
+    xDomain = d3.extent([].concat.apply([], embedding).map(e => e[0]));
+    yDomain = d3.extent([].concat.apply([], embedding).map(e => e[1]));
+  }
+
+  embeddingScales[chart] = {
+    x: d3.scaleLinear()
+        .domain(xDomain)
+        .range([0, width]),
+    y: d3.scaleLinear()
+        .domain(yDomain)
+        .range([width, 0])
+  }
+
+}
+
+var indToCol = function (ind) {
+  ind++;
+  return "rgb(" + (Math.floor(ind / 65536) % 256) + ", " +
+                  (Math.floor(ind / 256) % 256) + ", " +
+                  (ind % 256) + ")";
+}
+
+var colToInd = function (iData) {
+  if(iData.data[3] != 255) return 0;
+  return iData.data[0] * 65536 + iData.data[1] * 256 + iData.data[2];
+}
+
+var drawPoints = function (chart) {
+  //if all colours are "gray", it's the first time the points are drawn
+  //fill the background
+  if(colours[chart][0] === "gray") {
+    var ctx = d3.select("#bg" + chart).node()
+      .getContext("2d");
+
+    ctx.fillStyle = bgColour;
+    embedding[chart].forEach(function(el, i) {
+      ctx.beginPath();
+      ctx.arc(embeddingScales[chart].x(el[0]), embeddingScales[chart].y(el[1]), pointSize, 0, 2 * Math.PI);
+      ctx.fill();
+    });    
+  }
+
+  //if there is no hidden canvas yet, create one
+//  if(!hiddenCanvases[chart]) {
+//    hiddenCanvases[chart] = document.createElement("canvas");
+//    hiddenCanvases[chart].setAttribute("width", width);
+//    hiddenCanvases[chart].setAttribute("height", width);
+//    var ctxH = hiddenCanvases[chart].getContext("2d");
+
+//    embedding[chart].forEach(function(el, i) {
+//      ctxH.imageSmoothingEnabled = false;
+//      ctxH.beginPath();
+//      ctxH.arc(embeddingScales[chart].x(el[0]), embeddingScales[chart].y(el[1]), d3.max([pointSize, 2]), 0, 2 * Math.PI);
+//      ctxH.fillStyle = indToCol(i);
+//      ctxH.fill();
+//    });    
+//  }
+
+  var ctx = d3.select("#points" + chart).node()
+    .getContext("2d");
+
+  ctx.clearRect(0, 0, width, width);
+
+  embedding[chart].forEach(function(el, i) {
+    if(colours[chart][i] !== bgColour){
+      ctx.beginPath();
+      ctx.arc(embeddingScales[chart].x(el[0]), embeddingScales[chart].y(el[1]), pointSize, 0, 2 * Math.PI);
+      ctx.fillStyle = (embedding[chart][i].blocked ? "#aaa" : colours[chart][i]);
+      ctx.fill();
+    }
+   });
+  console.log("fin: " + (time - Date.now()));
+}
+
+var updateColour = function(chart) {
+  //change legend axis
+  d3.axisTop()
+    .scale(axisScales[chart])
+    (d3.select("#chart" + chart)
+      .select(".legend")
+        .select(".axis").transition(1000));
+
+  //change legend gradient
+  var stops = d3.select("#chart" + chart)
+    .select("defs")
+      .select("#colourLegend")
+        .selectAll("stop")
+          .data(d3.range(6).map(e => e/5));
+  stops.enter()
+    .append("stop")
+    .style("stop-opacity", 1)
+    .merge(stops)
+      .attr("offset", d => d * 100 + "%")
+      .style("stop-color", d => colourScales[chart](d * scaleDist[chart]));
+}
+
+new_center_cell_A = function(retDists) {
+  var allDists = Array(compare == "distances" ? n_charts : 1);
+  time = Date.now();
+  get_dists = function(ch) {
+    if(featureMatrix) {
+      var dists = Array( embedding[ch].length ),
+        x_sel_cell = featureMatrix[ ch ][ centerCell[1] ];
+
+      for( var j = 0; j < dists.length; j++ ) {
+        var s = 0;
+        for(var i = 0; i < x_sel_cell.length; i++) {
+          var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
+          s += dd * dd;
+        }
+        dists[j] = Math.sqrt(s);
+      }
+    } else 
+      dists = distance[ch][centerCell[1]];
+
+    return dists;
+  }
+
+  if(compare == "distances")
+    for(ch = 0; ch < n_charts; ch++)
+      allDists[ch] = get_dists(ch)
+  else
+    allDists[0] = get_dists(centerCell[0]);
+
+  for( ch = 0; ch < n_charts; ch++ ) {
+    d3.select( "#chart" + ch )
+      .select("g.legend")
+      .style( "display", ch == centerCell[0] ? "initial" : "none" );
+
+    var colourScale = (compare == "distances" ? colourScales[ch] : colourScales[centerCell[0]]),
+      dists = (compare == "distances" ? allDists[ch] : allDists[0]);
+
+
+    colours[ch] = dists.map(el => colourScales[ch](el));
+    console.log("Start drawing: " + (time - Date.now()));
+    drawPoints(ch);
+
+  }
+
+  if(retDists)
+    return allDists;
+}
+
+new_center_cell_B = function(retDists) {
+
+  var x_sel_cell = featureMatrix[centerCell[0]][ centerCell[1] ];
+  var allDists = Array(n_charts);
+
+  for( ch = 0; ch < n_charts; ch++ ) {
+
+    var dists = Array( embedding[ch].length )
+    for( var j = 0; j < dists.length; j++ ) {
+      var s = 0
+      for( var i = 0; i < x_sel_cell.length; i++ ) {
+        var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
+        s += dd * dd;
+      }
+
+      dists[j] = Math.sqrt(s);
+    }
+
+    if(retDists)
+      allDists[ch] = dists;
+      
+    colours[ch] = dists.map(el => colourScales[ch](el));
+    drawPoints(ch);
+  }
+  if(retDists)
+    return allDists;
+}
+
+addSVGs = function(n, ncol, nrow) {
+  if(ncol == undefined) {
+    if(nrow == undefined) {
+      ncol = Math.ceil(Math.sqrt(n));
+      nrow = Math.ceil(n / ncol);
+    } else {
+      ncol = Math.ceil(n / nrow);
+    }    
+  } else {
+    if(nrow == undefined)
+      nrow = Math.ceil(n / ncol);
+  }
+   
+  d3.select("#embeddings")
+    .selectAll("tr")
+      .data(d3.range(nrow))
+        .enter()
+          .append("tr");
+  var cells = d3.select("#embeddings")
+    .selectAll("tr")
+      .selectAll("td")
+        .data(d => d3.range(ncol).map(e => [d, e]))
+          .enter()
+            .append("td")
+              .append("div")
+                .style("position", "relative");
+  cells
+    .append("canvas")
+      .attr("id", d => "points" + (d[0] * nrow + d[1]))
+      .style("position", "absolute")
+      .style("top", 0)
+      .style("left", 0)
+      .style("z-index", -1)
+      .attr("width", width)
+      .attr("height", width);
+
+  cells
+    .append("canvas")
+      .attr("id", d => "bg" + (d[0] * nrow + d[1]))
+      .style("position", "absolute")
+      .style("top", 0)
+      .style("left", 0)
+      .style("z-index", -2)
+      .attr("width", width)
+      .attr("height", width);
+
+  cells
+    .append("svg")
+      .attr("id", d => "chart" + (d[0] * nrow + d[1]));
+
+}
+
+getSnapshotData = function(point, emb) {
+   centerCell = [emb, point];
+
+   var dists = (mode == "A" ? new_center_cell_A(true) : new_center_cell_B(true));
+
+   if(jrc) {
+      jrc.sendData("embs", embedding);
+      jrc.sendData("dists", dists);
+      jrc.sendData("pointSize", pointSize);
+      jrc.sendData("maxdists", mode == "A" ? scaleDist[centerCell[0]] : scaleDist);
+      jrc.sendData("titles", titles);
+      jrc.sendData("finished", 1);
+   }
+}
+
+fireClosest = function (chart, pos) {
+  point = quadtrees[chart].find(pos[0], pos[1], pointSize * 3);
+  if(point) {
+    centerCell = [chart, point[2]];
+    window["new_center_cell_" + mode]();
+  }
+}
+
+function call_pacer( interval ) {
+
+   /*
+   This "call pacer" serves to avoid jerky appearance when a redraw
+   function is triggered to often because events fire to rapidly.
+   
+   Say, you have a handler, e.g., for a 'drag' event, which is supposed
+   to call an 'update' function. Usually you would write
+      some_object.on( "drag", update );
+   If 'update' is complex, you may want to make sure that it is not called
+   more often than, say, once in 30 ms. If the drag event fires more often,
+   intermittant calls to 'update' should be skipped. For this, write.
+     var pacer = call_pacer( 30 );
+     some_object.on( "drag", function() { pacer.do( update ) } )
+   Now, pacer.do will call 'update', but only if the last call was more than
+   30 ms ago. It also ensures that after a lapse of more than 30 ms without
+   event, the last lapsed call is then called, to draw the final state.
+   */
+
+   var obj = {
+      interval: interval,
+      prev_time: -Infinity,
+      timer: null }
+
+   obj.do = function() {
+      var callback = arguments[0],
+        args = [];
+      for(var i = 1; i < arguments.length; i++)
+        args.push(arguments[i]);
+      if( obj.timer )
+         obj.timer.stop();
+      if( d3.now() - obj.prev_time >= interval ) {         
+         callback.call(this, args);
+         obj.prev_time = d3.now();
+      } else {
+         obj.timer = d3.timeout( callback, 1.5 * interval )
+      }
+   }
+
+   return obj;
+}
+
+</script>
+</body>
+</html>

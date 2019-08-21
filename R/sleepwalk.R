@@ -105,7 +105,7 @@
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
                        distances = NULL, same = c( "objects", "features" ), compare = c("embeddings", "distances"),
-                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL) {
+                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL, mode = "svg") {
   same = match.arg( same )
   compare = match.arg( compare )
   
@@ -219,7 +219,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   }
   
   if(is.null(saveToFile)) {
-    jrc::openPage( FALSE, system.file( package="sleepwalk" ), "sleepwalk.html" )
+    jrc::openPage( FALSE, system.file( package="sleepwalk" ), paste0("sleepwalk_", mode, ".html") )
     
     if( same == "objects" ) 
       jrc::sendData( "mode", "A" )
@@ -243,7 +243,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     jrc::sendData( "compare", compare )
     jrc::sendCommand( "set_up_chart()" )
   } else {
-    content <- readLines(paste0(system.file( package="sleepwalk" ), "/", "sleepwalk.html"), warn = F)
+    content <- readLines(paste0(system.file( package="sleepwalk" ), "/",  paste0("sleepwalk_", mode, ".html")), warn = F)
     
     while(sum(grepl("script src", content)) != 0) {
       i <- which(grepl("script src", content))[1]
