@@ -80,12 +80,12 @@ featureMatrix = undefined;
 distance = undefined;
 
 var centerCell = [0, 0], xDomain, yDomain, ncol, nrow,
-  bgColour = d3.interpolateCubehelixDefault(0.8), time;
+  bgColour = d3.interpolateCubehelixDefault(0.8), busy = false,
+  pacer = call_pacer(100);
 
 set_up_chart = function() {
 
   addSVGs(n_charts, ncol, nrow);
-  var pacer = call_pacer(150);
 
   colourScales = [];
   axisScales = [];
@@ -207,20 +207,7 @@ set_up_chart = function() {
         var timer;
         return function() {
           var pos = d3.mouse(this);
-          pacer.do(function() {fireClosest(ch, pos)});
-//          timer = d3.timeout(function() {fireClosest(ch, pos)}, 250);
-//          var ind = colToInd(hiddenCanvases[ch].getContext("2d").getImageData(pos[0], pos[1], 1, 1));
-//          if(ind != 0){
-//            ind--;
-//            if(Math.abs(embeddingScales[ch].x(embedding[ch][ind][0]) - pos[0]) < d3.max([2, pointSize]) && 
-//                Math.abs(embeddingScales[ch].y(embedding[ch][ind][1]) - pos[1]) < d3.max([2, pointSize]) &&
-//                (centerCell[0] != ch || centerCell[1] != ind)) {
-//              timer.stop();
-//              console.log("timer stopped");
-//              centerCell = [ch, ind];
-//              (function() {pacer.do(window["new_center_cell_" + mode])}) ();
-//            }
-//          }
+          pacer.do(fireClosest, ch, pos);
         }
       } (ch) );
     
@@ -328,27 +315,12 @@ var drawPoints = function (chart) {
     });    
   }
 
-  //if there is no hidden canvas yet, create one
-//  if(!hiddenCanvases[chart]) {
-//    hiddenCanvases[chart] = document.createElement("canvas");
-//    hiddenCanvases[chart].setAttribute("width", width);
-//    hiddenCanvases[chart].setAttribute("height", width);
-//    var ctxH = hiddenCanvases[chart].getContext("2d");
-
-//    embedding[chart].forEach(function(el, i) {
-//      ctxH.imageSmoothingEnabled = false;
-//      ctxH.beginPath();
-//      ctxH.arc(embeddingScales[chart].x(el[0]), embeddingScales[chart].y(el[1]), d3.max([pointSize, 2]), 0, 2 * Math.PI);
-//      ctxH.fillStyle = indToCol(i);
-//      ctxH.fill();
-//    });    
-//  }
-
   var ctx = d3.select("#points" + chart).node()
     .getContext("2d");
 
   ctx.clearRect(0, 0, width, width);
 
+  var start = Date.now();
   embedding[chart].forEach(function(el, i) {
     if(colours[chart][i] !== bgColour){
       ctx.beginPath();
@@ -357,7 +329,7 @@ var drawPoints = function (chart) {
       ctx.fill();
     }
    });
-  console.log("fin: " + (time - Date.now()));
+  busy = false;
 }
 
 var updateColour = function(chart) {
@@ -384,7 +356,6 @@ var updateColour = function(chart) {
 
 new_center_cell_A = function(retDists) {
   var allDists = Array(compare == "distances" ? n_charts : 1);
-  time = Date.now();
   get_dists = function(ch) {
     if(featureMatrix) {
       var dists = Array( embedding[ch].length ),
@@ -420,7 +391,6 @@ new_center_cell_A = function(retDists) {
 
 
     colours[ch] = dists.map(el => colourScales[ch](el));
-    console.log("Start drawing: " + (time - Date.now()));
     drawPoints(ch);
 
   }
@@ -529,49 +499,43 @@ fireClosest = function (chart, pos) {
   if(point) {
     centerCell = [chart, point[2]];
     window["new_center_cell_" + mode]();
+  } else {
+    busy = false;
   }
 }
 
-function call_pacer( interval ) {
+function call_pacer(interval) {
 
-   /*
-   This "call pacer" serves to avoid jerky appearance when a redraw
-   function is triggered to often because events fire to rapidly.
-   
-   Say, you have a handler, e.g., for a 'drag' event, which is supposed
-   to call an 'update' function. Usually you would write
-      some_object.on( "drag", update );
-   If 'update' is complex, you may want to make sure that it is not called
-   more often than, say, once in 30 ms. If the drag event fires more often,
-   intermittant calls to 'update' should be skipped. For this, write.
-     var pacer = call_pacer( 30 );
-     some_object.on( "drag", function() { pacer.do( update ) } )
-   Now, pacer.do will call 'update', but only if the last call was more than
-   30 ms ago. It also ensures that after a lapse of more than 30 ms without
-   event, the last lapsed call is then called, to draw the final state.
-   */
+  var obj = {
+    callback: function() {},
+    interval: interval,
+    timer: null}
 
-   var obj = {
-      interval: interval,
-      prev_time: -Infinity,
-      timer: null }
+  obj.do = function() {
+    var callback = arguments[0],
+      args = [];
 
-   obj.do = function() {
-      var callback = arguments[0],
-        args = [];
-      for(var i = 1; i < arguments.length; i++)
-        args.push(arguments[i]);
-      if( obj.timer )
-         obj.timer.stop();
-      if( d3.now() - obj.prev_time >= interval ) {         
-         callback.call(this, args);
-         obj.prev_time = d3.now();
-      } else {
-         obj.timer = d3.timeout( callback, 1.5 * interval )
-      }
-   }
+    obj.block = true;
+    for(var i = 1; i < arguments.length; i++)
+      args.push(arguments[i]);
+    obj.callback = function() {callback.apply(this, args)};
 
-   return obj;
+    obj.try();
+  }
+
+  obj.try = function() {
+    if(obj.timer) obj.timer.stop();
+    if(!busy) {
+      busy = true;
+      setTimeout(obj.callback);
+      obj.callback = function() {};
+    } else {
+      obj.timer = d3.timeout(obj.try, 1000);
+    }
+    
+  }
+
+  return obj;
 }
 
 </script>
