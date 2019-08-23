@@ -92,6 +92,7 @@ set_up_chart = function() {
   embeddingScales = [];
   colours = [];
   quadtrees = [];
+  notSelected = [];
 
   //this is to allow independent change in scales even for
   //"features" mode. May be changed later.
@@ -118,6 +119,7 @@ set_up_chart = function() {
       .x(function(ch) {return d => embeddingScales[ch].x(d[0])} (ch))
       .y(function(ch) {return d => embeddingScales[ch].y(d[1])} (ch))
       .addAll(embedding[ch].map((el, i) => el.concat(i)));
+    notSelected[ch] = [];
 
     //define colour gradient for the legend
     d3.select("#chart" + ch)
@@ -200,6 +202,7 @@ set_up_chart = function() {
           .text(titles[ch]);
     }
 
+    drawBackground(ch);
     drawPoints(ch);
     
     d3.select("#points" + ch)
@@ -207,7 +210,7 @@ set_up_chart = function() {
         var timer;
         return function() {
           var pos = d3.mouse(this);
-          pacer.do(fireClosest, ch, pos);
+          pacer.do(centerClosest, ch, pos);
         }
       } (ch) );
     
@@ -227,9 +230,8 @@ set_up_chart = function() {
           .closePathDistance(75)
           .area(d3.select("#chart" + ch))
           .on("end", function() {
-            lasso.items().forEach(function(el, i) {
-              embedding[ch][i].blocked = !el.selected;
-            });
+            notSelected[ch] = lasso.items().map(el => !el.selected);
+            drawBackground(ch);
             drawPoints(ch);
           })
           .on("start", function() {
@@ -301,20 +303,6 @@ var colToInd = function (iData) {
 }
 
 var drawPoints = function (chart) {
-  //if all colours are "gray", it's the first time the points are drawn
-  //fill the background
-  if(colours[chart][0] === "gray") {
-    var ctx = d3.select("#bg" + chart).node()
-      .getContext("2d");
-
-    ctx.fillStyle = bgColour;
-    embedding[chart].forEach(function(el, i) {
-      ctx.beginPath();
-      ctx.arc(embeddingScales[chart].x(el[0]), embeddingScales[chart].y(el[1]), pointSize, 0, 2 * Math.PI);
-      ctx.fill();
-    });    
-  }
-
   var ctx = d3.select("#points" + chart).node()
     .getContext("2d");
 
@@ -322,7 +310,7 @@ var drawPoints = function (chart) {
 
   var start = Date.now();
   embedding[chart].forEach(function(el, i) {
-    if(colours[chart][i] !== bgColour){
+    if(colours[chart][i] !== bgColour && !notSelected[chart][i]){
       ctx.beginPath();
       ctx.arc(embeddingScales[chart].x(el[0]), embeddingScales[chart].y(el[1]), pointSize, 0, 2 * Math.PI);
       ctx.fillStyle = (embedding[chart][i].blocked ? "#aaa" : colours[chart][i]);
@@ -330,6 +318,30 @@ var drawPoints = function (chart) {
     }
    });
   busy = false;
+}
+
+drawBackground = function(chart) {
+  var ctx = d3.select("#bg" + chart).node()
+    .getContext("2d");
+
+  ctx.clearRect(0, 0, width, width);
+
+  ctx.fillStyle = bgColour;
+  embedding[chart].forEach(function(el, i) {
+    ctx.beginPath();
+    ctx.arc(embeddingScales[chart].x(el[0]), embeddingScales[chart].y(el[1]), pointSize, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+
+  ctx.fillStyle = "#aaa";
+  embedding[chart].forEach(function(el, i) {
+    if(notSelected[chart][i]) {
+      ctx.beginPath();
+      ctx.arc(embeddingScales[chart].x(el[0]), embeddingScales[chart].y(el[1]), pointSize, 0, 2 * Math.PI);
+      ctx.fill();      
+    }
+  });
+
 }
 
 var updateColour = function(chart) {
@@ -494,7 +506,7 @@ getSnapshotData = function(point, emb) {
    }
 }
 
-fireClosest = function (chart, pos) {
+centerClosest = function (chart, pos) {
   point = quadtrees[chart].find(pos[0], pos[1], pointSize * 3);
   if(point) {
     centerCell = [chart, point[2]];
