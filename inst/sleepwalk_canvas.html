@@ -233,16 +233,14 @@ set_up_chart = function() {
             notSelected[ch] = lasso.items().map(el => !el.selected);
             drawBackground(ch);
             drawPoints(ch);
-          })
-          .on("start", function() {
-//            var container;
-//            if(mode == "A")
-//              container = d3.select("#embeddings")
-//            else
-//              container = d3.select("#chart" + ch);
+            if(mode == "A") 
+              for(var i = 0; i < n_charts; i++) 
+                if(i !== ch) {
+                  notSelected[i] = notSelected[ch];
+                  drawBackground(i);
+                  drawPoints(i);
+                }
 
-//            container.selectAll(".point")
-//              .classed("not_selected", false);
           });
         return lasso;
       }(ch));
@@ -317,7 +315,6 @@ var drawPoints = function (chart) {
       ctx.fill();
     }
    });
-  busy = false;
 }
 
 drawBackground = function(chart) {
@@ -407,6 +404,8 @@ new_center_cell_A = function(retDists) {
 
   }
 
+  busy = false;
+
   if(retDists)
     return allDists;
 }
@@ -435,6 +434,9 @@ new_center_cell_B = function(retDists) {
     colours[ch] = dists.map(el => colourScales[ch](el));
     drawPoints(ch);
   }
+
+  busy = false;
+
   if(retDists)
     return allDists;
 }
