@@ -8,7 +8,7 @@ sleepwalk(embeddings, featureMatrices = NULL, maxdists = NULL,
   pointSize = 1.5, titles = NULL, distances = NULL,
   same = c("objects", "features"), compare = c("embeddings",
   "distances"), saveToFile = NULL, ncol = NULL, nrow = NULL,
-  on_selection = NULL)
+  on_selection = NULL, mode = c("canvas", "svg"))
 }
 \arguments{
 \item{embeddings}{either an \eqn{n x 2} embedding matrix (where \eqn{n} is a number of points) or
@@ -66,6 +66,10 @@ it'll become static.}
 \item{on_selection}{a callback function that is called every time the user selects a group of points in
 the web browser. From the \code{sleepwalk} app it gets two arguments: The first one is a vector of indices of
 all the selected points and the second one is an index of an embedding from where the points were selected.}
+
+\item{mode}{defines whether to use Canvas or SVG to display points. Using Canvas is faster and allows to plot 
+more points simultaneously, yet we currently consider SVG mode to be more stable and vigorously tested. In future
+versions SVG mode will be deprecated. Must be one of \code{"canvas"} or \code{"svg"}.}
 }
 \value{
 None.

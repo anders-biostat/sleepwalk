@@ -67,6 +67,9 @@
 #' @param on_selection a callback function that is called every time the user selects a group of points in
 #' the web browser. From the \code{sleepwalk} app it gets two arguments: The first one is a vector of indices of
 #' all the selected points and the second one is an index of an embedding from where the points were selected.
+#' @param mode defines whether to use Canvas or SVG to display points. Using Canvas is faster and allows to plot 
+#' more points simultaneously, yet we currently consider SVG mode to be more stable and vigorously tested. In future
+#' versions SVG mode will be deprecated. Must be one of \code{"canvas"} or \code{"svg"}.
 #' 
 #' @return None.
 #' 
@@ -105,9 +108,10 @@
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
                        distances = NULL, same = c( "objects", "features" ), compare = c("embeddings", "distances"),
-                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL, mode = "svg") {
+                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL, mode = c("canvas", "svg")) {
   same = match.arg( same )
   compare = match.arg( compare )
+  mode = match.arg( mode )
   
   if(is.null(featureMatrices)) {
     if(same == "features")
@@ -122,8 +126,10 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   rm(list = ls(envir = .slw), envir = .slw)
   if(is.null(on_selection)) {
     .slw$on_selection <- function(points, emb) {
-      message(paste0("You've selected ", length(points), " points from the embedding ", emb, "."))
-      message(paste0("The indices of the selected points are now stored in the variable 'selPoints'."))
+      if(length(points) > 0){
+        message(paste0("You've selected ", length(points), " points from the embedding ", emb, "."))
+        message(paste0("The indices of the selected points are now stored in the variable 'selPoints'."))
+      }
     }
   } else {
     stopifnot(is.function(on_selection))
