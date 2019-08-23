@@ -207,7 +207,6 @@ set_up_chart = function() {
     
     d3.select("#points" + ch)
       .on("mousemove", function(ch) {
-        var timer;
         return function() {
           var pos = d3.mouse(this);
           pacer.do(centerClosest, ch, pos);
@@ -221,6 +220,15 @@ set_up_chart = function() {
           .select("canvas").node()
           .dispatchEvent(new MouseEvent(d3.event.type, d3.event));
       })
+      .on("dblclick", function(ch) {
+        return function() {
+          if(jrc){
+            var pos = d3.mouse(this);
+            var ind = quadtrees[ch].find(pos[0], pos[1], pointSize * 2)[2];
+            jrc.sendCommand("message('Use \"slw_snapshot(" + (ind + 1) + ", " + (ch + 1) + ")\" to get this plot in your R Session')");
+          }            
+        }
+      } (ch))
       .call(function(ch) {
         var lasso = d3.lasso()
           .items(embedding[ch].map(function(el, i) {
@@ -255,8 +263,6 @@ set_up_chart = function() {
           });
         return lasso;
       }(ch));
-
-
    }
 }
 
