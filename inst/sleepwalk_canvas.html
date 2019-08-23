@@ -223,9 +223,10 @@ set_up_chart = function() {
       })
       .call(function(ch) {
         var lasso = d3.lasso()
-          .items(embedding[ch].map(function(el) {
+          .items(embedding[ch].map(function(el, i) {
             return {x: embeddingScales[ch].x(el[0]),
-                    y: embeddingScales[ch].y(el[1])}
+                    y: embeddingScales[ch].y(el[1]),
+                    ind: i}
           }))
           .closePathDistance(75)
           .area(d3.select("#chart" + ch))
@@ -240,6 +241,16 @@ set_up_chart = function() {
                   drawBackground(i);
                   drawPoints(i);
                 }
+
+            if(jrc) {
+              var selInds = lasso.items()
+                .filter(el => el.selected)
+                .map(el => el.ind + 1);
+              if(selInds.length == embedding[ch].length)
+                selInds = [];
+              jrc.sendData("selPoints", selInds);
+              jrc.sendCommand("sleepwalk::.slw$on_selection(selPoints, " + (+ch + 1) +")");
+            }
 
           });
         return lasso;
