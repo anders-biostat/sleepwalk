@@ -1,5 +1,21 @@
+## Resubmission
+
+This is a new version of the package. Some performance improvent was made and a minor bug fixed. See News.md
+for more details.
+
 ## Test environments
 * local ubuntu 18.04 LST, R 3.6.1
+* win-builder: R-devel
+* ubuntu 14.04.5 LTS, R-devel, R 3.5.2, R 3.4.4 (travis ci)
+
+## R CMD check results
+
+There were no ERRORS, WARNINGS or NOTES
+
+#Previous cran-comments
+
+## Test environments
+* local ubuntu 16.04 LST, R 3.5.1
 * win-builder: R-devel
 * ubuntu 14.04.5 LTS, R-devel, R 3.5.2, R 3.4.4 (travis ci)
 
