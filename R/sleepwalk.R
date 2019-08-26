@@ -69,11 +69,13 @@
 #' all the selected points and the second one is an index of an embedding from where the points were selected.
 #' @param mode defines whether to use Canvas or SVG to display points. Using Canvas is faster and allows to plot 
 #' more points simultaneously, yet we currently consider SVG mode to be more stable and vigorously tested. In future
-#' versions SVG mode will be deprecated. Must be one of \code{"canvas"} or \code{"svg"}.
+#' versions SVG mode will be deprecated. Must be one of \code{canvas} or \code{svg}.
 #' 
 #' @return None.
 #' 
 #' @author Simon Anders, Svetlana Ovchinnikova
+#' 
+#' @references \url{https://doi.org/10.1101/603589}
 #'
 #' @examples 
 #' #generate cockscrew-shaped 3D data with 3 additional noisy dimensions

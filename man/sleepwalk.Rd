@@ -69,7 +69,7 @@ all the selected points and the second one is an index of an embedding from wher
 
 \item{mode}{defines whether to use Canvas or SVG to display points. Using Canvas is faster and allows to plot 
 more points simultaneously, yet we currently consider SVG mode to be more stable and vigorously tested. In future
-versions SVG mode will be deprecated. Must be one of \code{"canvas"} or \code{"svg"}.}
+versions SVG mode will be deprecated. Must be one of \code{canvas} or \code{svg}.}
 }
 \value{
 None.
@@ -113,6 +113,9 @@ sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)),
           saveToFile = paste0(tempdir(), "/test.html"))
 
   
+}
+\references{
+\url{https://doi.org/10.1101/603589}
 }
 \author{
 Simon Anders, Svetlana Ovchinnikova

@@ -1,3 +1,6 @@
+// derived from https://github.com/skokenes/D3-Lasso-Plugin Copyright (c) 2015-2016, Speros Kokenes
+// some changes have been added
+
 d3.lasso = function() {
 
     var items = null,
