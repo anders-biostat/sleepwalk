@@ -1,4 +1,6 @@
 [![Travis Build Status](https://travis-ci.org/anders-biostat/sleepwalk.svg?branch=master)](https://travis-ci.org/anders-biostat/sleepwalk)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/sleepwalk)](https://cran.r-project.org/package=sleepwalk)
+[![Downloads](http://cranlogs.r-pkg.org/badges/sleepwalk?color=brightgreen)](http://www.r-pkg.org/pkg/sleepwalk)
 
 # sleepwalk
 Exploring dimension-reduced embeddings
