@@ -256,7 +256,7 @@ set_up_chart = function() {
                 .map(el => el.ind + 1);
               if(selInds.length == embedding[ch].length)
                 selInds = [];
-              jrc.callFunction("on_selection", [selInds, (+ch + 1)], null, ".slw");
+              jrc.callFunction(".slw$on_selection", [selInds, (+ch + 1)], null, "sleepwalk");
             }
 
           });

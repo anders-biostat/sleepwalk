@@ -241,7 +241,7 @@ set_up_chart = function() {
                            .classed("not_selected", true);
 
                      if(jrc) 
-                        jrc.callFunction("on_selection", [selInds, (+ch + 1)], null, ".slw");
+                        jrc.callFunction(".slw$on_selection", [selInds, (+ch + 1)], null, "sleepwalk");
                      
                   }
                })

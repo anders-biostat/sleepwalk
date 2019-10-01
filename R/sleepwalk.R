@@ -66,9 +66,7 @@
 #' it'll become static.
 #' @param on_selection a callback function that is called every time the user selects a group of points in
 #' the web browser. From the \code{sleepwalk} app it gets two arguments: The first one is a vector of indices of
-#' all the selected points and the second one is an index of an embedding from where the points were selected. For 
-#' the callback function to work properly, one need to load the \code{sleepwalk} library, not just use this function
-#' with \code{sleepwalk::sleepwalk(...)}.
+#' all the selected points and the second one is an index of an embedding from where the points were selected.
 #' @param mode defines whether to use Canvas or SVG to display points. Using Canvas is faster and allows to plot 
 #' more points simultaneously, yet we currently consider SVG mode to be more stable and vigorously tested. In future
 #' versions SVG mode will be deprecated. Must be one of \code{canvas} or \code{svg}.
@@ -234,7 +232,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
                    rootDirectory = system.file( package="sleepwalk" ), 
                    startPage = paste0("sleepwalk_", mode, ".html"), ... )
     jrc::limitStorage(n = 0)
-    jrc::allowFunctions(c("message", "on_selection"))
+    jrc::allowFunctions(c("message", ".slw$on_selection"))
     jrc::allowVariables(c("embs", "dists", "pointSize", "maxdists", "titles", "finished"))
     
     if( same == "objects" ) 
