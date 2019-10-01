@@ -66,10 +66,13 @@
 #' it'll become static.
 #' @param on_selection a callback function that is called every time the user selects a group of points in
 #' the web browser. From the \code{sleepwalk} app it gets two arguments: The first one is a vector of indices of
-#' all the selected points and the second one is an index of an embedding from where the points were selected.
+#' all the selected points and the second one is an index of an embedding from where the points were selected. For 
+#' the callback function to work properly, one need to load the \code{sleepwalk} library, not just use this function
+#' with \code{sleepwalk::sleepwalk(...)}.
 #' @param mode defines whether to use Canvas or SVG to display points. Using Canvas is faster and allows to plot 
 #' more points simultaneously, yet we currently consider SVG mode to be more stable and vigorously tested. In future
 #' versions SVG mode will be deprecated. Must be one of \code{canvas} or \code{svg}.
+#' @param ... Further arguments passed to \code{\link[jrc]{openPage}}.
 #' 
 #' @return None.
 #' 
@@ -110,7 +113,7 @@
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
                        distances = NULL, same = c( "objects", "features" ), compare = c("embeddings", "distances"),
-                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL, mode = c("canvas", "svg")) {
+                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL, mode = c("canvas", "svg"), ...) {
   same = match.arg( same )
   compare = match.arg( compare )
   mode = match.arg( mode )
@@ -130,7 +133,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     .slw$on_selection <- function(points, emb) {
       if(length(points) > 0){
         message(paste0("You've selected ", length(points), " points from the embedding ", emb, "."))
-        message(paste0("The indices of the selected points are now stored in the variable 'selPoints'."))
+        message(paste0("To access them, plese, specify a callback function by setting the 'on_selection' argument."))
       }
     }
   } else {
@@ -227,7 +230,12 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   }
   
   if(is.null(saveToFile)) {
-    jrc::openPage( FALSE, system.file( package="sleepwalk" ), paste0("sleepwalk_", mode, ".html") )
+    jrc::openPage( useViewer = FALSE, 
+                   rootDirectory = system.file( package="sleepwalk" ), 
+                   startPage = paste0("sleepwalk_", mode, ".html"), ... )
+    jrc::limitStorage(n = 0)
+    jrc::allowFunctions(c("message", "on_selection"))
+    jrc::allowVariables(c("embs", "dists", "pointSize", "maxdists", "titles", "finished"))
     
     if( same == "objects" ) 
       jrc::sendData( "mode", "A" )

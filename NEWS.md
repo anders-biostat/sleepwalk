@@ -1,3 +1,12 @@
+# sleepwalk 0.2.1
+
+* Changes due to an update of the `jrc` package.
+
+* Indices of selected points are no longer stored in a variable and can be accessed only via the callback function. 
+Thus, no changes to the global environment are made, unless user specifies them his- or herself.
+
+* Added the possibility to pass arguments to jrc::openPage (such as port number or browser in which to open the app.)
+
 # sleepwalk 0.2.0
 
 * Now HTML Canvas is used to plot the embedding. It makes Sleepwalk faster and allows to simultaneously display more points.

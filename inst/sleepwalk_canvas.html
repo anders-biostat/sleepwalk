@@ -225,7 +225,7 @@ set_up_chart = function() {
           if(jrc){
             var pos = d3.mouse(this);
             var ind = quadtrees[ch].find(pos[0], pos[1], pointSize * 2)[2];
-            jrc.sendCommand("message('Use \"slw_snapshot(" + (ind + 1) + ", " + (ch + 1) + ")\" to get this plot in your R Session')");
+            jrc.callFunction("message", "Use \"slw_snapshot(" + (ind + 1) + ", " + (ch + 1) + ")\" to get this plot in your R Session.");
           }            
         }
       } (ch))
@@ -256,8 +256,7 @@ set_up_chart = function() {
                 .map(el => el.ind + 1);
               if(selInds.length == embedding[ch].length)
                 selInds = [];
-              jrc.sendData("selPoints", selInds);
-              jrc.sendCommand("sleepwalk::.slw$on_selection(selPoints, " + (+ch + 1) +")");
+              jrc.callFunction("on_selection", [selInds, (+ch + 1)], null, ".slw");
             }
 
           });

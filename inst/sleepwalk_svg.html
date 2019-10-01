@@ -213,7 +213,7 @@ set_up_chart = function() {
       on_double_click = ( function(ch) {
          return function( d, i ) { 
             if(jrc){
-               jrc.sendCommand("message('Use \"slw_snapshot(" + (i + 1) + ", " + (ch + 1) + ")\" to get this plot in your R Session')");
+               jrc.callFunction("message", "Use \"slw_snapshot(" + (i + 1) + ", " + (ch + 1) + ")\" to get this plot in your R Session.");
             }  
          }
       })( ch );
@@ -240,10 +240,8 @@ set_up_chart = function() {
                         lasso.notSelectedItems()
                            .classed("not_selected", true);
 
-                     if(jrc) {
-                        jrc.sendData("selPoints", selInds.map(el => el + 1));
-                        jrc.sendCommand("sleepwalk::.slw$on_selection(selPoints, " + (+ch + 1) +")");
-                     }
+                     if(jrc) 
+                        jrc.callFunction("on_selection", [selInds, (+ch + 1)], null, ".slw");
                      
                   }
                })
