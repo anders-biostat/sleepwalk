@@ -1,7 +1,6 @@
 ## Resubmission
 
-This is a new version of the package. The changes are caused by update `jrc` package 
-(resubmitted alongside this one).
+This is a new version of the package. The changes are caused by update `jrc` package.
 
 ## Test environments
 * local ubuntu 18.04 LST, R 3.6.1
