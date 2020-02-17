@@ -518,7 +518,7 @@ getSnapshotData = function(point, emb) {
       jrc.sendData("embs", embedding);
       jrc.sendData("dists", dists);
       jrc.sendData("pointSize", pointSize);
-      jrc.sendData("maxdists", mode == "A" ? scaleDist[centerCell[0]] : scaleDist);
+      jrc.sendData("maxdists", mode == "A" && compare != "distances" ? scaleDist[centerCell[0]] : scaleDist);
       jrc.sendData("titles", titles);
       jrc.sendData("finished", 1);
    }
