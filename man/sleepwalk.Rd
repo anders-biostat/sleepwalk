@@ -4,11 +4,23 @@
 \alias{sleepwalk}
 \title{Interactively explore one or several 2D embeddings}
 \usage{
-sleepwalk(embeddings, featureMatrices = NULL, maxdists = NULL,
-  pointSize = 1.5, titles = NULL, distances = NULL,
-  same = c("objects", "features"), compare = c("embeddings",
-  "distances"), saveToFile = NULL, ncol = NULL, nrow = NULL,
-  on_selection = NULL, mode = c("canvas", "svg"), ...)
+sleepwalk(
+  embeddings,
+  featureMatrices = NULL,
+  maxdists = NULL,
+  pointSize = 1.5,
+  titles = NULL,
+  distances = NULL,
+  same = c("objects", "features"),
+  compare = c("embeddings", "distances"),
+  saveToFile = NULL,
+  ncol = NULL,
+  nrow = NULL,
+  on_selection = NULL,
+  mode = c("canvas", "svg"),
+  metric = "euclid",
+  ...
+)
 }
 \arguments{
 \item{embeddings}{either an \eqn{n x 2} embedding matrix (where \eqn{n} is a number of points) or
@@ -70,6 +82,10 @@ all the selected points and the second one is an index of an embedding from wher
 \item{mode}{defines whether to use Canvas or SVG to display points. Using Canvas is faster and allows to plot 
 more points simultaneously, yet we currently consider SVG mode to be more stable and vigorously tested. In future
 versions SVG mode will be deprecated. Must be one of \code{canvas} or \code{svg}.}
+
+\item{metric}{specifies what metric to use to calculate distances from feature matrices. Currently only Euclidean 
+(\code{"euclid"}, default) and cosine (\code{"cosine"}) are supported. This can be a single string (then the selected
+metric is used for all the charts) or a vector of strings - one per each chart.}
 
 \item{...}{Further arguments passed to \code{\link[jrc]{openPage}}.}
 }

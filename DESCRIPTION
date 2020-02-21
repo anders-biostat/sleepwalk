@@ -15,6 +15,6 @@ Description: A tool to interactively explore the
   Uniform Manifold Approximation and Projection (UMAP) or any other.
 License: GPL-3
 Imports: jrc (>= 0.2.0), cowplot, httpuv, jsonlite, scales, ggplot2
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 URL: https://anders-biostat.github.io/sleepwalk/
 BugReports: https://github.com/anders-biostat/sleepwalk/issues

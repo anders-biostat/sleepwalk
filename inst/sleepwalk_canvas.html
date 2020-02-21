@@ -71,6 +71,8 @@ n_charts = 2;
 //"A" - same objects
 //"B" - same features
 mode = "A";
+// "euclid" or "cosine"
+metric = undefined;
 
 pointSize = 1.5;
 
@@ -107,6 +109,11 @@ set_up_chart = function() {
   if( distance && embedding.length != distance.length )
     for(var i = 1; i < embedding.length; i++ )
       distance[i] = distance[0];
+
+  if(metric === undefined)
+    metric = Array(n_charts).fill("euclid");
+  if(metric.length == 1 && n_charts != 1)
+    metric = Array(n_charts).fill(metric[0]);
 
   for( var ch = 0; ch < n_charts; ch++ ) {
     //define all the scales     
@@ -379,32 +386,42 @@ var updateColour = function(chart) {
       .style("stop-color", d => colourScales[chart](d * scaleDist[chart]));
 }
 
-new_center_cell_A = function(retDists) {
-  var allDists = Array(compare == "distances" ? n_charts : 1);
-  get_dists = function(ch) {
-    if(featureMatrix) {
-      var dists = Array( embedding[ch].length ),
-        x_sel_cell = featureMatrix[ ch ][ centerCell[1] ];
-
-      for( var j = 0; j < dists.length; j++ ) {
-        var s = 0;
-        for(var i = 0; i < x_sel_cell.length; i++) {
-          var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
-          s += dd * dd;
-        }
-        dists[j] = Math.sqrt(s);
+get_dist = function(selected, ch) {
+  var dists = Array( embedding[ch].length );
+  
+  if(metric[ch] == "euclid") {
+    for( var j = 0; j < dists.length; j++ ) {
+      var s = 0;
+      for(var i = 0; i < selected.length; i++) {
+        var dd = selected[i] - featureMatrix[ch][j][i];
+        s += dd * dd;
       }
-    } else 
-      dists = distance[ch][centerCell[1]];
-
-    return dists;
+      dists[j] = Math.sqrt(s);
+    }
+    return dists
   }
 
+  if(metric[ch] == "cosine") {
+    for( var j = 0; j < dists.length; j++ ) {
+      var s = 0;
+      for(var i = 0; i < selected.length; i++) {
+        s += selected[i] * featureMatrix[ch][j][i];
+      }
+      dists[j] = Math.acos(s)/Math.PI;
+    }  
+    return dists;
+  }
+  
+}
+
+new_center_cell_A = function(retDists) {
+  var allDists = Array(compare == "distances" ? n_charts : 1);
+
   if(compare == "distances")
-    for(ch = 0; ch < n_charts; ch++)
-      allDists[ch] = get_dists(ch)
+    for(let ch = 0; ch < n_charts; ch++)
+      allDists[ch] = featureMatrix ? get_dist(featureMatrix[ ch ][ centerCell[1] ], ch) : distance[ch][centerCell[1]];
   else
-    allDists[0] = get_dists(centerCell[0]);
+    allDists[0] = featureMatrix ? get_dist(featureMatrix[ centerCell[0] ][ centerCell[1] ], centerCell[0]) : distance[centerCell[0]][centerCell[1]];
 
   for( ch = 0; ch < n_charts; ch++ ) {
     d3.select( "#chart" + ch )
@@ -414,8 +431,7 @@ new_center_cell_A = function(retDists) {
     var colourScale = (compare == "distances" ? colourScales[ch] : colourScales[centerCell[0]]),
       dists = (compare == "distances" ? allDists[ch] : allDists[0]);
 
-
-    colours[ch] = dists.map(el => colourScales[ch](el));
+    colours[ch] = dists.map(el => colourScale(el));
     drawPoints(ch);
 
   }
@@ -432,18 +448,8 @@ new_center_cell_B = function(retDists) {
   var allDists = Array(n_charts);
 
   for( ch = 0; ch < n_charts; ch++ ) {
-
-    var dists = Array( embedding[ch].length )
-    for( var j = 0; j < dists.length; j++ ) {
-      var s = 0
-      for( var i = 0; i < x_sel_cell.length; i++ ) {
-        var dd = x_sel_cell[i] - featureMatrix[ch][j][i];
-        s += dd * dd;
-      }
-
-      dists[j] = Math.sqrt(s);
-    }
-
+    var dists = get_dist(featureMatrix[centerCell[0]][ centerCell[1] ], ch);
+    
     if(retDists)
       allDists[ch] = dists;
       

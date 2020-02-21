@@ -70,6 +70,9 @@
 #' @param mode defines whether to use Canvas or SVG to display points. Using Canvas is faster and allows to plot 
 #' more points simultaneously, yet we currently consider SVG mode to be more stable and vigorously tested. In future
 #' versions SVG mode will be deprecated. Must be one of \code{canvas} or \code{svg}.
+#' @param metric specifies what metric to use to calculate distances from feature matrices. Currently only Euclidean 
+#' (\code{"euclid"}, default) and cosine (\code{"cosine"}) are supported. This can be a single string (then the selected
+#' metric is used for all the charts) or a vector of strings - one per each chart.
 #' @param ... Further arguments passed to \code{\link[jrc]{openPage}}.
 #' 
 #' @return None.
@@ -111,7 +114,8 @@
 #' @export
 sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, pointSize = 1.5, titles = NULL,
                        distances = NULL, same = c( "objects", "features" ), compare = c("embeddings", "distances"),
-                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL, mode = c("canvas", "svg"), ...) {
+                       saveToFile = NULL, ncol = NULL, nrow = NULL, on_selection = NULL, mode = c("canvas", "svg"), 
+                       metric = "euclid", ...) {
   same = match.arg( same )
   compare = match.arg( compare )
   mode = match.arg( mode )
@@ -171,6 +175,18 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     stopifnot( length(embeddings) == length(featureMatrices) )
   }  
   
+  if(!is.null(featureMatrices)) {
+    stopifnot(is.vector(metric))
+    if(length(metric) == 1 && length(featureMatrices) != 1)
+      metric <- rep(metric, length(featureMatrices))
+    
+    stopifnot(length(metric) == length(featureMatrices))
+    
+    for(i in 1:length(metric))
+      if(metric[i] == "cosine")
+        featureMatrices[[i]] <- featureMatrices[[i]] / sqrt(rowSums(featureMatrices[[i]]^2))
+  }
+    
   oneFM <- NULL
   if(length(embeddings) != length(featureMatrices %||% distances))
     oneFM <- 1
@@ -212,7 +228,11 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
         message(paste0("Estimating 'maxdist' for feature matrix "), i)
         pairs <- cbind(sample(nrow(featureMatrices[[i]]), 1500, TRUE), 
                        sample(nrow(featureMatrices[[i]]), 1500, TRUE))
-        median(sqrt(rowSums((featureMatrices[[i]][pairs[, 1], , drop = FALSE] - featureMatrices[[i]][pairs[, 2], , drop = FALSE])^2))) 
+        if(metric[i] == "euclid")  {
+          median(sqrt(rowSums((featureMatrices[[i]][pairs[, 1], , drop = FALSE] - featureMatrices[[i]][pairs[, 2], , drop = FALSE])^2)))
+        } else {
+          median(acos(rowSums(featureMatrices[[i]][pairs[, 1], , drop = FALSE] * featureMatrices[[i]][pairs[, 2], ,drop = FALSE]))/pi)
+        }
       })
     } else {
       maxdists <- sapply(distances, median)
@@ -246,6 +266,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     jrc::sendData( "embedding", embeddings, TRUE )
     if(!is.null(featureMatrices)) {
       jrc::sendData( "featureMatrix", featureMatrices, TRUE )
+      jrc::sendData( "metric", metric, TRUE)
     } else {
       jrc::sendData( "distance", distances, TRUE )
     }
