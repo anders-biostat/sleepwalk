@@ -66,9 +66,16 @@ umapres <- umap( pca$x )
 
 # Now compare these
 sleepwalk( 
-  list( tsneRNA$Y, tsneRNA$Y ), 
-  list(pca$x, pca$x),
-  metric = c("euclid", "cosine"), compare = "distances")
+  list( tsneRNA$Y, umapres$layout), 
+  pca$x,
+  0.07)
+
+#norms <- pca$x/sqrt(rowSums(pca$x^2))
+
+sleepwalk(tsneRNA$Y,
+          list(norms, norms), 
+          metric = c("euclid", "cosine"),
+          compare = "distances")
 
 # Does one actually need to normalize?
 pca_U <- prcomp_irlba( t(log2(countsRNA+1)), n=10 )

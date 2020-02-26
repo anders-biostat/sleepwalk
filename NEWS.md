@@ -1,3 +1,11 @@
+# sleepwalk 0.3.0
+
+* New argument `metric` allows to use angular distance (`metric = "cosine"`) as an alternative to default Euclidean distance
+(`meric = "euclid"`).
+
+* If `compare = "distances"`, it is no longer requiered to provide several embeddings. If only one embedding is given, it
+will be used for all the distances.
+
 # sleepwalk 0.2.1
 
 * Changes due to an update of the `jrc` package.

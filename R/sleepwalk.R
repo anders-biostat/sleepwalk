@@ -158,7 +158,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   stopifnot( is.list(embeddings) )
   
   if(length(embeddings) == 1 && same == "features")
-    same = "objects"
+    same <- "objects"
   
   if(!is.null(dim(featureMatrices)))
     featureMatrices <- list(featureMatrices)
@@ -166,7 +166,10 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     distances <- list(distances)
   
   stopifnot( is.list(featureMatrices %||% distances) )
-
+  
+  if(compare == "distances" && length(embeddings) == 1 && length(featureMatrices %||% distances) != 1) 
+    embeddings <- rep(embeddings, length(featureMatrices %||% distances))
+  
   if( same == "objects" ) {
     stopifnot( length(embeddings) == length(featureMatrices %||% distances) | 
                  length(featureMatrices %||% distances) == 1 )
