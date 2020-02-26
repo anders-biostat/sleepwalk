@@ -1,5 +1,21 @@
 ## Resubmission
 
+This is a new version of the package. It adds new argument `metric` that provides an alternative
+to default Euclidean distance.
+
+## Test environments
+* local ubuntu 18.04 LST, R 3.6.2
+* win-builder: R-devel
+* ubuntu 16.04.6 LTS, R-devel, R 3.6.2, R 3.5.3 (travis ci)
+
+## R CMD check results
+
+There were no ERRORS, WARNINGS or NOTES
+
+# Previous cran-comments
+
+## Resubmission
+
 This is a new version of the package. The changes are caused by update `jrc` package.
 
 ## Test environments
@@ -10,8 +26,6 @@ This is a new version of the package. The changes are caused by update `jrc` pac
 ## R CMD check results
 
 There were no ERRORS, WARNINGS or NOTES
-
-#Previous cran-comments
 
 ## Resubmission
 

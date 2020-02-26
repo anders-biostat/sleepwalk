@@ -2,7 +2,7 @@ Package: sleepwalk
 Type: Package
 Title: Interactively Explore Dimension-Reduced Embeddings
 Version: 0.3.0
-Date: 2020-26-02
+Date: 2020-02-26
 Authors@R: c(
     person( "Svetlana", "Ovchinnikova", role=c("aut","cre"), 
        email = "s.ovchinnikova@zmbh.uni-heidelberg.de" ),
