@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="src/style.css">
 </head>
 <body>
+	<div style="margin-bottom: 80px;">
 	<div id = "panel"></div>
 
 	<div class="container">
@@ -23,11 +24,11 @@
 		regions of the plot. Buttons are provided to change the range of the colour scale.</p>
 		<p>For more information and a more comprehensive introduction to Sleepwalk, please refer to the paper or to the <a  href="https://anders-biostat.github.io/sleepwalk/">Sleepwalk web page</a></p>
 		</div>
-		
-		<p id = "header" class="text"><i>Please, select an example from the side bar</i></p>
-		<p id = "description" class="text"></p>
+	</div>
 	</div>
 	<div id = "wrapper">
+		<p id = "header" class="text"><i>Please select an example from the side bar</i></p>
+		<p id = "description" class="text"></p>
 		<div class="aspect-ratio">
 			<iframe id = "frame"></iframe>
 		</div>
@@ -35,79 +36,96 @@
 	<script type="text/javascript">
 		var samples = {
 			clusters: {
-				file: "Fig_B.html",
+				file: "src/Fig_B.html",
 				title: "Basic example",
 				n: 2,
 				descr: "Here, each point is a cell from a cord-blood sample (Stoeckius et al., <i>Simultaneous epitope and transcriptome " +
 					"measurement in single cells</i>, Nature Methods, 14:865, 2017). The embedding is produced by t-SNE following the " + 
 					"<a href='https://satijalab.org/seurat/multimodal_vignette.html'>Seurat workflow</a>.<br>" +
-					"We can see, how cells are nicely separated into clusters by the cell type. Sleepwalk gives the user an opportunity to " +
-					"explore the structure of these clusters. For example, one can easily see that T cell cluster is more dense, than monocyte cluster. " +
-					"One can find it by first moving the mouse to the center of the T cell cluster: almost the entire cluster will light up in dark-green. " +
-					"Then if the user moves the cursor to the monocyte cluster, he or she will see the different picture: With the same colour scale only " +
-					"a small part of the cells will be highlighted and one can observe a smooth change of neighbourhoods by moving the mouse above the cluster. " +
-					"Sleepwalk also allows to explore cluster bounderies. Try to follow the edges with you mouse and you'll find that sometimes bounderies are not " +
-					"as sharp as they appear in the embeddings and also that some of the points there are clear outliers that shouldn't be part of any cluster. " +
-					"After increasing the displayed distance range by pressint the '+' button, it becomes possible to compare distances between the entire clusters. " +
+					"We can see how cells are nicely separated into clusters by the cell type. Sleepwalk allows us to " +
+					"explore the structure of these clusters. For example, one can easily see that the T cell cluster is more dense than the monocyte cluster: " +
+					"Move the mouse to the center of the T cell cluster, and almost the entire cluster will light up in dark-green. " +
+					"If you then move the cursor to the monocyte cluster, you will see a different picture: At the same colour scale, only " +
+					"a small part of the cells will be highlighted and one can observe a smooth change of neighbourhoods by moving the mouse through the cluster. " +
+					"Sleepwalk also allows to explore cluster bounderies. Try to follow the edges with your mouse and you note how bounderies sometimes are not " +
+					"as sharp as they appear in the embeddings and how some of the points are clear outliers that seem to not belong to any cluster. " +
+					"After increasing the displayed distance range by pressing the '+' button, you can compare distances between entire clusters. " +
 					"For instance, hover the mouse over the B cell cluster, to see its neigbours.",
 				header: "T-SNE Rendition of a Single-Cell Coord-Blood Sapmle"
 			},
 			embeddings_cite: {
-				file: "Fig_Ca.html",
+				file: "src/Fig_Ca.html",
 				title: "Compare embeddings (cord-blood data set)",
 				n: 2,
 				descr: "Here, we compare embeddings obtained from t-SNE and UMAP for the cord-blood single-cell data set. (Stoeckius et al., <i>Simultaneous epitope and transcriptome " +
-					"measurement in single cells</i>, Nature Methods, 14:865, 2017). Both embeddings show the same set of cells and therefore each point in one embedding has a pair in " +
+					"measurement in single cells</i>, Nature Methods, 14:865, 2017). Both embeddings show the same set of cells and therefore each point in one embedding corrsponds to a point in " +
 					"the other. At any given moment the paired points from the embeddings have the same colour, which allows user immediately to see how neighbourhoods of the cells are " +
-					"transformed by each of the embeddings and thus compare their perfomance. In this example one may noticed that there is hardly any difference between UMAP and t-SNE " +
+					"transformed by each of the embeddings and thus compare their performance. In this example there is suprisingly little difference between UMAP and t-SNE " +
 					"visualizations.",
 				header: "Comparison between t-SNE and UMAP visualizations for cord-blood data set"
 			},
 			embeddings_cer: {
-				file: "Fig_C.html",
+				file: "src/Fig_C.html",
 				title: "Compare embeddings (murine cerebellum)",
 				n: 2,
-				descr: "Here, we compare embeddings obtained from t-SNE and UMAP for the single-cell sample from a developing murine cerebellum on the E13.5 embrional stage. " +
+				descr: "Here, we compare embeddings obtained from t-SNE and UMAP for a single-cell sample from the developing murine cerebellum at the E13.5 embryonal stage. " +
 					"(Carter et al., <i>A Single-Cell Transcriptional Atlas of " +
-					"the Developing Murine Cerebellum</i>, Current Biology, 28:18, 2018). Both embeddings show the same set of cells and therefore each point in one embedding has a pair in " +
+					"the Developing Murine Cerebellum</i>, Current Biology, 28:18, 2018). Both embeddings show the same set of cells and therefore each point in one embedding corresponds to a point in " +
 					"the other. At any given moment the paired points from the embeddings have the same colour, which allows user immediately to see how neighbourhoods of the cells are " +
 					"transformed by each of the embeddings and thus compare their perfomance. We can see a clear correspondance between the major structures generated by t-SNE and by UMAP. " +
-					"Both embeddings group early progenitor cells in a distinct cluster (upper-left corner) with two clusters of differnciating cells: GABAergic lineage goes down and to the right in " +
-					"both embeddings, while glutamatergic progenitors a placed in the upper-right area of the plots. Howerver, here Sleepwalk allows one to see, that in UMAP embedding the glutamatergic " +
-					"branch starts from a protusion in the lower part of early progenitor cluster and then intersects the GABAergic branch. Try to follow the glutamatergic branch in the t-SNE rendition to " +
+					"Both embeddings group early progenitor cells in a distinct cluster (upper-left corner) from which two branches of differenciating cells emerge: The GABAergic lineage goes down and to the right in " +
+					"both embeddings, while glutamatergic progenitors a placed in the upper-right area of the plots. Here, Sleepwalk allows one to see that in UMAP embedding the glutamatergic " +
+					"branch seems to starts from a protusion in the lower part of early progenitor cluster and then intersects the GABAergic branch. Try to follow the glutamatergic branch in the t-SNE rendition to " +
 					"see this yourself.",
 				header: "Comparison between t-SNE and UMAP visualizations for murine cerebellum data set"
 			},
 			samples: {
-				file: "Fig_D.html",
+				file: "src/Fig_D.html",
 				title: "Compare samples",
 				n: 3,
 				descr: "This example shows UMAP embeddings for three samples from the developing murine cerebellum. Two biological replicates of time point E13.5 and " +
 					"one from time point E14.5. We use Sleepwalk to find the correspoding structures. Here, colour always shows the Euclidean distance from a selected cells to " +
-					"all others in all the samples. So, one can always see where are the closest neigbours of each cell in other samples, and thus explore differences and " +
-					"similarities between different samples, without any complicated analysis or batch efferct correction. Exploring the data with the mouse shows the two replicas " + 
-					"of E13.5 samples are almost identical. The two branches (GABAergic and glutamatergic neurons) can be easily followed from the early progenitor cells up to the " +
+					"all others in <i>all</i> the samples. So, one can always see where the closest neigbours are of each cell in other samples, and thus explore differences and " +
+					"similarities between different samples, without any need for batch effect correction or intgrating analyses. Exploring the data with the mouse shows the two replicates " + 
+					"of E13.5 samples to be very similar. The two branches (GABAergic and glutamatergic neurons) can be easily followed from the early progenitor cells up to the " +
 					"most differentiated ones. Comparing between the two E13.5 replicates reveals which aspects of the peculiar two-pronged shape of the glutamatergic branch is " +
 					"simply due to random variation and what seems reproducible. In the later E14.5 sample, the branches have disconnected from the progenitor cells, but " +
 					"Sleepwalk allows us to still identify corresponding cells. Interestingly, Sleepwalk can show that the GABAergic lineage is differentiated further in the E14.5 " +
-					"than in E13.5 samples, as the endpoint of the branch in E14.5 corresponds to an intermediate point in E13.5. Sleepwalk allows one to discover such details " + 
-					"immediately, with minimal effort. Of course, such a visual exploration cannot replace a tailored detailed analysis but it is does provide a starting point and a first overview.",
+					"than in E13.5 samples, as the endpoint of the branch in E14.5 corresponds to an intermediate point in E13.5.",
 				header: "Comparison between samples obtained at different stages of murine cerebellum development"
 			},
 			distances: {
-				file: "Fig_E.html",
-				title: "Compare distances",
+				file: "src/Fig_E.html",
+				title: "Compare distances (CiteSeq)",
 				n: 2,
-				descr: "This exaples shows how one can compare different distances using Sleepwalk. Now we have two identical embeddings of the cord-blood " +
-					"single-cell data set produced by t-SNE, but the colours shows different distances" +
-					"We make use of the epitope data available in this data set. For each cell besides the usual RNA-Seq output that was used in the previous " + 
-					"examples the abundance levels of 13 surface markers is provided. We can use this to calculate distances between cells in a completely " + 
-					"independent manner and compare that with expression-profile based distances. In the embeddings to the left Sleepwalk shows distances that " +
-					"are calculated from the epitope data. At the same time in the other embedding we can see usual Euclidean distances from the same cell based on " +
-					"the gene expression profiles. " +
+				descr: "This example shows how one can compare different distance metrics using Sleepwalk. Here, we have two identical embeddings of the cord-blood " +
+					"single-cell data set produced by t-SNE, but the colours shows different distances: " +
+					"The cord-blood data-set was produced to demonstrate the CiteSeq protocol, which allows to simultaneously asses for each cell transcriptome and &ldquo;epitome&rdquo;," +
+					"i.e., the abundance of selected surface marker protein bound by oligo-conjugated antibodies. " +
+					"While the embedding (i.e., the positioning of the points) is calculated in both panels from the Euclidean distances in the transcritptome data, these " +
+					"distances determine the colours in the right-hand panel, while the colours in the left-hand panel are distances acording to the epitope data." +
 					"One can see that epitope data ensures better separation of the clusters and also highlights some hidden sturctures: " +
-					"Try to move the mouse to the center of monocyte cluster and you'll see that a group of monocytes clearly standing out. And beeing able to see " +
-					"the exact border between CD4+ and CD8+ T cells allows one truly realize how similar are their expression profiles.",
+					"Try to move the mouse to the center of monocyte cluster and you willll see that a group of monocytes clearly stands out. Being able to see " +
+					"the exact border between CD4+ and CD8+ T cells only in the epitome colours shows how similar their expression profiles are.",
+				header: "Comparison between distances within the same sample"
+			},
+			distances_dif: {
+				file: "src/Fig_F.html",
+				title: "Compare distances (Diffusion distances)",
+				n: 2,
+				m: 1,
+				descr: "Here, we continue to explore metric differences using Sleepwalk. For murine cerebellum data as an example (E13.5 embryonal stage, " + 
+					"Carter et al., <i>A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum</i>, Current Biology, 28:18, 2018) " +
+					"diffusion distance is calculated and is shown together with the Euclidean distance. Both are calculated with and without first applying PCA and keeping " +
+					"only  the first 50 principal components. One can see, that the Euclidean distance calculated on ~1000 variable genes is almost unable to capture any patterns in the " +
+					"data. This is an expected result due to the curse of dimensionality. If we first reduce the number of dimensions to 50 using PCA, the Euclidean distance is enough " +
+					"to distinguish two cell type branches. However, the separation is smudged. Diffusion distance computed on the same variable genes seems to be quite similar to " +
+					"the combination of Euclidean and PCA with some of smaller clusters being close to the two main branches. And finally diffusion distance computed on the first " +
+					"50 principal component demostrates the cleanest separation of cell type branches and also of the smaller clusters. Note, that this example is a comparison of " +
+					"not four, but five distances, the fifth being geodesic distance calculated to generate the UMAP embedding. To generate this embedding we also used only 50 first " +
+					"principal components, so there is no surprise that distances based on them are more similar to the embedding. However, we cannot claim whether it makes them " +
+					"more truthful or not. Sleepwalk allows one to compare distances and embeddings and to be aware of differences if there are any, yet it is not a benchmarking tool " +
+					"unless the true metric for the task at hand is known.",
 				header: "Comparison between distances within the same sample"
 			}
 		};
@@ -121,11 +139,11 @@
 						.text(d => samples[d].title)
 						.on("click", function(d) {
 							d3.select("#frame")
-								.attr("src", "src/" + samples[d].file);
+								.attr("src", samples[d].file);
 							d3.select("#wrapper")
 								.style("max-width", samples[d].n * 550 + "px");
 							d3.select(".aspect-ratio")
-								.style("padding-bottom", (Math.round(115 / samples[d].n)) + "%" );
+								.style("padding-bottom", (Math.round(115 / (samples[d].m || samples[d].n))) + "%" );
 							d3.select("#header")
 								.html(samples[d].header);
 							d3.select("#description")
