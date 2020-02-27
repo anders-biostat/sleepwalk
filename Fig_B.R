@@ -1,9 +1,11 @@
-library(cowplot) # v0.9.4
+library(cowplot)
 library(tidyverse)
 library(ggrepel)
 library(sleepwalk) 
 
 load(file ="data/cite_data.rda")
+
+theme_set(theme_cowplot())
 
 features <- citeSeq$pca[, 1:citeSeq$ndims]
 vert <- (max(citeSeq$tsne[, 2]) - min(citeSeq$tsne[, 2]))/25

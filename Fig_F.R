@@ -35,11 +35,13 @@ getDifusionDist <- function(data, n = 16, n_neigh = 10, n_local = seq(to = min(7
 }
 
 library(readr)
-library(Seurat)
+library(Seurat) # v2.3.4
 library(irlba)
 library(Rfast)
 library(cowplot)
 library(sleepwalk)
+
+theme_set(theme_cowplot())
 
 e13_A <- read_rds("data/e13_A.rds")
 normAndVargenes <- function(obj) {
@@ -94,7 +96,8 @@ hor_um <- (max(um13_A[, 1]) - min(um13_A[, 1]))/25
 plots <- lapply(plots, function(plot) {
   plot + geom_segment(aes(x = um13_A[cell, 1] + 1.2 * hor_um, xend = um13_A[cell, 1] + 0.2 * hor_um, 
                    y = um13_A[cell, 2] + 1.2 * vert_um, yend = um13_A[cell, 2] + 0.2 * vert_um), size = 1,
-               colour = "red", arrow = arrow(length = unit(0.03, "npc")))
+               colour = "red", arrow = arrow(length = unit(0.03, "npc"))) +
+    theme(plot.title = element_text(hjust=0.5))
 })
 figF <- plot_grid(plotlist = plots, labels = c("A", "B", "C", "D"))
 

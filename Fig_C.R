@@ -1,6 +1,8 @@
 library(Seurat) # v2.3.4
-library(cowplot) # v0.9.4
+library(cowplot)
 library(tidyverse)
+
+theme_set(theme_cowplot())
 
 e135 <- read_rds("data/e13_A.rds")
 
@@ -37,10 +39,12 @@ cell <- 1914
 snsh <- slw_snapshot(cell, 1, TRUE)
 figC <- plot_grid(snsh[[1]] + geom_segment(aes(x = tsne$Y[cell, 1] + hor_tsne, xend = tsne$Y[cell, 1], 
                                        y = tsne$Y[cell, 2] + vert_tsne, yend = tsne$Y[cell, 2]), size = 1,
-                                   colour = "red", arrow = arrow(length = unit(0.03, "npc"))),
+                                   colour = "red", arrow = arrow(length = unit(0.03, "npc"))) +
+                    theme(plot.title = element_text(hjust=0.5), panel.background = element_blank()),
           snsh[[2]] + geom_segment(aes(x = um[cell, 1] - hor_um, xend = um[cell, 1], 
                                        y = um[cell, 2] - vert_um, yend = um[cell, 2]), size = 1,
-                                   colour = "red", arrow = arrow(length = unit(0.03, "npc"))),
+                                   colour = "red", arrow = arrow(length = unit(0.03, "npc"))) +
+            theme(plot.title = element_text(hjust=0.5)),
           labels = c("A", "B"))
 
 png(filename = "figures/Fig_C.png", 

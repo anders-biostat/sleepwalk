@@ -96,7 +96,7 @@ addLabels <- function(plot, types, emb, arrow = FALSE) {
     
   }
   
-  plot + theme(legend.text = element_text(size = 21), plot.title = element_text(size = 24))
+  plot + theme(legend.text = element_text(size = 21), plot.title = element_text(size = 24, hjust = 0.5))
 }
 
 
@@ -104,7 +104,9 @@ plots[[1]] <- addLabels(plots[[1]], types13_A, um13_A)
 plots[[2]] <- addLabels(plots[[2]], types13_B, um13_B, TRUE)
 plots[[3]] <- addLabels(plots[[3]], types14, um14)
 
-library(cowplot) #v0.9.4
+library(cowplot)
+
+theme_set(theme_cowplot())
 
 figD <- plot_grid(plotlist = plots, nrow = 1, labels = c("A", "B", "C"), label_size = 24)
 
