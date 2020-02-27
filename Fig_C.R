@@ -1,7 +1,5 @@
-set.seed(1234)
-
-library(Seurat)
-library(cowplot)
+library(Seurat) # v2.3.4
+library(cowplot) # v0.9.4
 library(tidyverse)
 
 e135 <- read_rds("data/e13_A.rds")
@@ -13,13 +11,16 @@ e135 <- FindVariableGenes(e135, do.plot = FALSE, y.cutoff = 0.5)
 data <- t(as.matrix(e135@data[e135@var.genes, ]))
 
 library(irlba)
+set.seed(55555)
 pca <- prcomp_irlba(data, n = 50)
 
 library(Rtsne)
-tsne <- Rtsne(pca$x, pca = F)
+set.seed(55555)
+tsne <- Rtsne(pca$x, pca = FALSE)
 
 library(uwot)
-um <- umap(pca$x, spread = 7)
+set.seed(55555)
+um <- umap(pca$x, spread = 7, n_sgd_threads = 1)
 
 write_rds(um, "data/e13A_umap.rds", compress = "gz")
 
@@ -40,7 +41,7 @@ figC <- plot_grid(snsh[[1]] + geom_segment(aes(x = tsne$Y[cell, 1] + hor_tsne, x
           snsh[[2]] + geom_segment(aes(x = um[cell, 1] - hor_um, xend = um[cell, 1], 
                                        y = um[cell, 2] - vert_um, yend = um[cell, 2]), size = 1,
                                    colour = "red", arrow = arrow(length = unit(0.03, "npc"))),
-          labels = c("a", "b"))
+          labels = c("A", "B"))
 
 png(filename = "figures/Fig_C.png", 
     width = 1000, height = 575)

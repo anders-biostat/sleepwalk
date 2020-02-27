@@ -1,6 +1,4 @@
-set.seed(1234)
-
-library(Seurat)
+library(Seurat) # v2.3.4
 library(tidyverse)
 
 e13_A <- read_rds("data/e13_A.rds")
@@ -24,8 +22,9 @@ library(irlba)
 library(uwot)
 
 getEmbedding <- function(data) {
+  set.seed(55555)
   pca <- prcomp_irlba(data, n = 50)
-  umap(pca$x, spread = 7)
+  umap(pca$x, spread = 7, n_sgd_threads = 1)
 }
 
 um13_A <- read_rds("data/e13A_umap.rds") #use embedding from the figure C
@@ -34,6 +33,7 @@ um14 <- getEmbedding(data14)
 
 commonGenes <- intersect(intersect(e13_A@var.genes, e13_B@var.genes), e14@var.genes)
 
+set.seed(55555)
 pca <- prcomp_irlba(rbind(data13_A[, commonGenes], data13_B[, commonGenes], data14[, commonGenes]), n = 50)
 comFeatures13_A <- data13_A[, commonGenes] %*% pca$rotation
 comFeatures13_B <- data13_B[, commonGenes] %*% pca$rotation
@@ -82,16 +82,21 @@ addLabels <- function(plot, types, emb, arrow = FALSE) {
   vert <- (max(emb[, 2]) - min(emb[, 2]))/25
   hor <- (max(emb[, 1]) - min(emb[, 1]))/25
   
-  plot$layers <- c(geom_mark_hull(aes(x = emb[, 1], y = emb[, 2], group = types, label = types, filter = types != "unknown"), 
-                                     linetype = 2, concavity = 4, size = 1.5, colour = "grey"), plot$layers)
+#  plot$layers <- c(geom_mark_hull(aes(x = emb[, 1], y = emb[, 2], group = types, label = types, filter = types != "unknown"), 
+#                                     linetype = 2, concavity = 3, size = 1, colour = "#555555", label.fontface = "plain",
+#                                  label.fontsize = 20, label.buffer = unit(4, "mm"), con.cap = unit(1, "mm"), con.type = "straight"), plot$layers)
+  plot$layers <- c(geom_mark_ellipse(aes(x = emb[, 1], y = emb[, 2], group = types, label = types, filter = types != "unknown"), 
+                                     linetype = 2, size = 1, colour = "#555555", label.fontface = "plain",
+                                  label.fontsize = 20, label.buffer = unit(2, "mm"), con.cap = unit(1, "mm"), con.type = "straight",
+                                  radius = unit(2, "mm"), expand = -0.0025), plot$layers)
   if(arrow) {
-    plot + geom_segment(aes(x = emb[cell, 1] + hor, xend = emb[cell, 1], 
+    plot <- plot + geom_segment(aes(x = emb[cell, 1] + hor, xend = emb[cell, 1], 
                             y = emb[cell, 2] + vert, yend = emb[cell, 2]), size = 1,
                         colour = "red", arrow = arrow(length = unit(0.03, "npc")))
     
-  } else {
-    plot
   }
+  
+  plot + theme(legend.text = element_text(size = 21), plot.title = element_text(size = 24))
 }
 
 
@@ -99,14 +104,16 @@ plots[[1]] <- addLabels(plots[[1]], types13_A, um13_A)
 plots[[2]] <- addLabels(plots[[2]], types13_B, um13_B, TRUE)
 plots[[3]] <- addLabels(plots[[3]], types14, um14)
 
-library(cowplot)
+library(cowplot) #v0.9.4
 
-figD <- plot_grid(plotlist = plots, nrow = 1, labels = c("a", "b", "c"))
+figD <- plot_grid(plotlist = plots, nrow = 1, labels = c("A", "B", "C"), label_size = 24)
 
 getGeneExpr <- function(emb, data, title) {
    lapply(c("Msx3", "Meis2", "Lhx5"), function(gene)
       ggplot() + geom_point(aes(x = emb[, 1], y = emb[, 2], colour = data[, gene])) + 
-        labs(colour = gene, x = "", y = "", title = title))
+        labs(colour = gene, x = "", y = "", title = title) + 
+        theme(legend.text = element_text(size = 15), plot.title = element_text(size = 24), 
+              legend.title = element_text(size = 20), legend.key.height = unit(8, "mm")))
 }
 
 figDsup <- plot_grid(

@@ -1,7 +1,7 @@
-library(cowplot)
+library(cowplot) # v0.9.4
 library(tidyverse)
 library(ggrepel)
-library(sleepwalk)
+library(sleepwalk) 
 
 load(file ="data/cite_data.rda")
 
@@ -21,7 +21,7 @@ plotB <- getPlot(1659, 9)
 plotC <- getPlot(8176, 12)
 plotD <- getPlot(5618, 30)
 
-figB <- plot_grid(plotA, plotB, plotC, plotD, labels = c("a", "b", "c", "d"))
+figB <- plot_grid(plotA, plotB, plotC, plotD, labels = c("A", "B", "C", "D"))
 
 png(filename = "figures/Fig_B.png", 
     width = 900, height = 1000)
