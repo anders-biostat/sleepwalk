@@ -85,3 +85,7 @@ h4 {
 	font-weight: normal;
 	font-style: italic;
 }
+
+#wrapper {
+	width: calc(250px + 60%);
+}

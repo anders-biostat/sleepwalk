@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="content/style.css">
 </head>
 <body>
+	<div style="margin-bottom: 80px;">
 	<div id = "panel"></div>
 
 	<div class="container">
@@ -23,7 +24,7 @@
 		regions of the plot. Buttons are provided to change the range of the colour scale.</p>
 		<p>For more information and a more comprehensive introduction to Sleepwalk, please refer to the paper or to the <a  href="https://anders-biostat.github.io/sleepwalk/">Sleepwalk web page</a></p>
 		</div>
-		
+	</div>
 	</div>
 	<div id = "wrapper">
 		<p id = "header" class="text"><i>Please select an example from the side bar</i></p>
@@ -95,7 +96,7 @@
 			},
 			distances: {
 				file: "content/Fig_E.html",
-				title: "Compare distances",
+				title: "Compare distances (CiteSeq)",
 				n: 2,
 				descr: "This example shows how one can compare different distance metrics using Sleepwalk. Here, we have two identical embeddings of the cord-blood " +
 					"single-cell data set produced by t-SNE, but the colours shows different distances: " +
@@ -106,6 +107,25 @@
 					"One can see that epitope data ensures better separation of the clusters and also highlights some hidden sturctures: " +
 					"Try to move the mouse to the center of monocyte cluster and you willll see that a group of monocytes clearly stands out. Being able to see " +
 					"the exact border between CD4+ and CD8+ T cells only in the epitome colours shows how similar their expression profiles are.",
+				header: "Comparison between distances within the same sample"
+			},
+			distances_dif: {
+				file: "content/Fig_F.html",
+				title: "Compare distances (Diffusion distances)",
+				n: 2,
+				m: 1,
+				descr: "Here, we continue to explore metric differences using Sleepwalk. For murine cerebellum data as an example (E13.5 embryonal stage, " + 
+					"Carter et al., <i>A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum</i>, Current Biology, 28:18, 2018) " +
+					"diffusion distance is calculated and is shown together with the Euclidean distance. Both are calculated with and without first applying PCA and keeping " +
+					"only  the first 50 principal components. One can see, that the Euclidean distance calculated on ~1000 variable genes is almost unable to capture any patterns in the " +
+					"data. This is an expected result due to the curse of dimensionality. If we first reduce the number of dimensions to 50 using PCA, the Euclidean distance is enough " +
+					"to distinguish two cell type branches. However, the separation is smudged. Diffusion distance computed on the same variable genes seems to be quite similar to " +
+					"the combination of Euclidean and PCA with some of smaller clusters being close to the two main branches. And finally diffusion distance computed on the first " +
+					"50 principal component demostrates the cleanest separation of cell type branches and also of the smaller clusters. Note, that this example is a comparison of " +
+					"not four, but five distances, the fifth being geodesic distance calculated to generate the UMAP embedding. To generate this embedding we also used only 50 first " +
+					"principal components, so there is no surprise that distances based on them are more similar to the embedding. However, we cannot claim whether it makes them " +
+					"more truthful or not. Sleepwalk allows one to compare distances and embeddings and to be aware of differences if there are any, yet it is not a benchmarking tool " +
+					"unless the true metric for the task at hand is known.",
 				header: "Comparison between distances within the same sample"
 			}
 		};
@@ -123,7 +143,7 @@
 							d3.select("#wrapper")
 								.style("max-width", samples[d].n * 550 + "px");
 							d3.select(".aspect-ratio")
-								.style("padding-bottom", (Math.round(115 / samples[d].n)) + "%" );
+								.style("padding-bottom", (Math.round(115 / (samples[d].m || samples[d].n))) + "%" );
 							d3.select("#header")
 								.html(samples[d].header);
 							d3.select("#description")
