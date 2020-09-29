@@ -1,3 +1,7 @@
+# sleepwalk 0.3.1
+
+* broken path to the start page, caused by `jrc` update fixed
+
 # sleepwalk 0.3.0
 
 * New argument `metric` allows to use angular distance (`metric = "cosine"`) as an alternative to default Euclidean distance

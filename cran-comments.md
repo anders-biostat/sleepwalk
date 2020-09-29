@@ -1,5 +1,12 @@
 ## Resubmission
 
+This version fixes issues caused by an update of the `jrc` package to version 0.4.0
+
+
+# Previous cran-comments
+
+## Resubmission
+
 This is a new version of the package. It adds new argument `metric` that provides an alternative
 to default Euclidean distance.
 
@@ -11,8 +18,6 @@ to default Euclidean distance.
 ## R CMD check results
 
 There were no ERRORS, WARNINGS or NOTES
-
-# Previous cran-comments
 
 ## Resubmission
 
