@@ -70,7 +70,7 @@ sleepwalk(
   pca$x,
   0.07)
 
-#norms <- pca$x/sqrt(rowSums(pca$x^2))
+norms <- pca$x/sqrt(rowSums(pca$x^2))
 
 sleepwalk(tsneRNA$Y,
           list(norms, norms), 
