@@ -37,6 +37,10 @@ and all but the first 13 principal components were omitted to reduce noise level
 	<iframe src="examples/single_emb.html"></iframe>
 </div>
 
+```r
+sleepwalk(citeSeq$tsne, features)
+```
+
 To the left you can see cell types assigned to each cluster in the [Seurat vignette](https://satijalab.org/seurat/multimodal_vignette.html).
 
 **Move your mouse over the gray points.** At any moment the colours will show you the "real" distances of all the cells to the one cell right under your mouse cursor. By "real distances", we mean those based on the original data, before the dimension reduction, and, by default, we calculate them as Euclidean distances. Thus, simply by moving the mouse you can explore the structure of the data and see where the embedding gives a faithful representation and where it is distorted.
@@ -60,6 +64,10 @@ obtained with another dimensionality reduction approach. This time, we have used
 	<iframe src="examples/comp_emb.html"></iframe>
 </div>
 
+```r
+sleepwalk(list(tsne$Y, umap), pca$x, titles = c("t-SNE", "UMAP"))
+```
+
 The main idea is the same: you move the mouse over an embedding and colour shows you the real distance from the current point to all others. But now you see distances from the same point on the other embedding as well. This allows you immediately identify the same clusters from both visualisations 
 and gives you an easy way to compare two (or more if you want) dimensionality reduction techniques applied to your data.
 
@@ -71,6 +79,11 @@ Again, single-cell transcriptomics has been used to study each sample, but here 
 <div class="aspect-ratio">
 	<iframe src="examples/comp_samp.html"></iframe>
 </div>
+
+```r
+sleepwalk(list(um13_A, um13_B, um14), list(comFeatures13_A, comFeatures13_B, comFeatures14),  
+          same = "features", titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1)
+```
 
 Here, our goal is to figure out if there are corresponding groups of cells in the two samples and what those groups are. `sleepwalk` can help here, too. The colour now shows the distance from the cell under the mouse cursor to all other cells in <i>all</i> the embeddings, allowing us to find the most similar cells not only in the current but also in the other samples. Exploring the data with the mouse shows the two replicas of E13.5 samples are almost identical. The two branches (GABAergic and glutamatergic neurons) can be easily followed from the early progenitor cells up to the most differentiated ones. Comparing between the two E13.5 replicates reveals which aspects of the peculiar two-pronged shape of the glutamatergic branch is simply due to random variation and what seems reproducible. In the later E14.5 sample, the branches have disconnected from the progenitor cells, but Sleepwalk allows us to still identify corresponding cells. Interestingly, Sleepwalk can show that the GABAergic lineage is differentiated further in the E14.5 than in E13.5 samples, as the endpoint of the branch in E14.5 corresponds to an intermediate point in E13.5. Sleepwalk allows one to discover such details immediately, with minimal effort. Of course, such a visual exploration cannot replace a tailored detailed analysis but it is does provide a starting point and a first overview.
 
@@ -108,13 +121,13 @@ If you have a Seurat data object, and have already run Seurat's `RunPCA` and `Ru
 
 for Seurat version 2.x:
 
-```
+```r
 sleepwalk( seu@dr$tsne@cell.embeddings, seu@dr$pca@cell.embeddings )
 ```
 
 for Seurat version 3.x:
 
-```
+```r
 sleepwalk( seu$tsne@cell.embeddings, seu$pca@cell.embeddings )
 ```
 
@@ -126,11 +139,11 @@ This takes the t-SNE embedding stored in the Seurat data object `seu` and displa
 
 Sleepwalk is being developed by [Svetlana Ovchinnikova](mailto:s.ovchinnikova@zmbh.uni-heidelberg.de) and [Simon Anders](mailto:s.anders@zmbh.uni-heidelberg.de) at the [Center for Molecular Biology of the University of Heidelberg](https://www.zmbh.uni-heidelberg.de/anders). Please contact us for questions or feedback, or file an [issue](https://github.com/anders-biostat/sleepwalk/issues) on GitHub if you find a bug.
 
-# Preprint
+# Paper
 
-A preprint describing Sleepwalk in more detail is available at BioRxiv:
+A paper describing Sleepwalk in more detail is published in Genome Research:
 
-S. Ovchinnikova and S. Anders: *Exploring dimension-reduced embeddings with Sleepwalk.* BioRvix 603589 (2019). [doi:10.1101/603589](https://doi.org/10.1101/603589).
+S. Ovchinnikova and S. Anders: *Exploring dimension-reduced embeddings with Sleepwalk.* Genome Research 30.5 (2020). [doi:10.1101/gr.251447.119](https://doi.org/10.1101/gr.251447.119).
 
 Please cite this paper if you use Sleepwalk in your research work.
 
