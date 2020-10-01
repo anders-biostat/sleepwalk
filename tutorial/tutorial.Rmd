@@ -7,15 +7,14 @@ In this tutorial we will show how to use `sleepwalk` to check the faithfullness 
 
 More information on `sleepwalk` can be found in our paper S. Ovchinnikova and S. Anders: *Exploring dimension-reduced embeddings with Sleepwalk.* Genome Research 30.5 (2020). [doi:10.1101/gr.251447.119](https://doi.org/10.1101/gr.251447.119). Here, we assume that reader is familiar with motivation behind `sleepwalk` and will focus only on its usage.
 
-First, let's load some data. As an example, we use single cell RNA-Seq data from Stoeckius et al., *Simultaneous epitope and transcriptome measurement in single cells*, [Nature Methods, 14:865](https://doi.org/10.1038/nmeth.4380), 2017. The data were processed as it is described in the the [Seurat vignette](https://satijalab.org/seurat/multimodal_vignette.html)
-
+First, let's load some data. As an example, we use single cell RNA-Seq data from Stoeckius et al., *Simultaneous epitope and transcriptome measurement in single cells*, [Nature Methods, 14:865](https://doi.org/10.1038/nmeth.4380), 2017. The data were processed as it is described in the [Seurat vignette](https://satijalab.org/seurat/multimodal_vignette.html). We followed it until the section "Add the protein expression levels to the Seurat object" and then stored the resulting Seurat object. You can download it [here](cite_seurat.rda)
 
 ```{r}
-load("cite_data.rda")
+load("cite_seurat.rda")
+
+cbmc
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+## Basic example
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+Now we a ready to make the most basic `sleepwalk` example. Here, we will show a t-SNE embedding and use Euclidean distances in PCA space to 

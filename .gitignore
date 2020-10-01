@@ -12,3 +12,5 @@ examples/seuratObject\.RData
 examples/saveData\.R
 
 R/\.Rhistory
+
+tutorial/tutorial.nb.html

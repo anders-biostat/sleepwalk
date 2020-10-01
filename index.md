@@ -128,12 +128,12 @@ sleepwalk( seu@dr$tsne@cell.embeddings, seu@dr$pca@cell.embeddings )
 for Seurat version 3.x:
 
 ```r
-sleepwalk( seu$tsne@cell.embeddings, seu$pca@cell.embeddings )
+sleepwalk( Embeddings(Reductions(seu, "tsne")), Embeddings(Reductions(seu, "pca")) )
 ```
 
 This takes the t-SNE embedding stored in the Seurat data object `seu` and displays it with t-SNE. Replace `tsne` with `umap` in case you have used `RunUMAP` instead of `RunTSNE`.
 
-(Note: The feature-space distances are calculated from the PCA coordinates, as this is what the t-SNE function gets by default. It is, of course, more accurate to pass as second parameter not the principal components buts the full data, and to do so, replace `seu@dr$pca@cell.embeddings` with `seu@data`. However, `data` is a huge matrix, and Sleepwalk might become quite slow.)
+(Note: The feature-space distances are calculated from the PCA coordinates, as this is what the t-SNE function gets by default. It is, of course, more accurate to pass as second parameter not the principal components buts the full data, and to do so, replace `Embeddings(Reductions(seu, "pca"))` with `GetAssayData(Assays(seu, "RNA"))`. However, `data` is a huge matrix, and Sleepwalk might become quite slow.)
 
 # Authors
 
