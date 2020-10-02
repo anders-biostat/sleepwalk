@@ -7,14 +7,91 @@ In this tutorial we will show how to use `sleepwalk` to check the faithfullness 
 
 More information on `sleepwalk` can be found in our paper S. Ovchinnikova and S. Anders: *Exploring dimension-reduced embeddings with Sleepwalk.* Genome Research 30.5 (2020). [doi:10.1101/gr.251447.119](https://doi.org/10.1101/gr.251447.119). Here, we assume that reader is familiar with motivation behind `sleepwalk` and will focus only on its usage.
 
-First, let's load some data. As an example, we use single cell RNA-Seq data from Stoeckius et al., *Simultaneous epitope and transcriptome measurement in single cells*, [Nature Methods, 14:865](https://doi.org/10.1038/nmeth.4380), 2017. The data were processed as it is described in the [Seurat vignette](https://satijalab.org/seurat/multimodal_vignette.html). We followed it until the section "Add the protein expression levels to the Seurat object" and then stored the resulting Seurat object. You can download it [here](cite_seurat.rda)
+First, let's load some data. As an example, we use single cell RNA-Seq data from Stoeckius et al., *Simultaneous epitope and transcriptome measurement in single cells*, [Nature Methods, 14:865](https://doi.org/10.1038/nmeth.4380), 2017. The data were processed as it is described in the [Seurat vignette](https://satijalab.org/seurat/multimodal_vignette.html). We followed it until the section "Add the protein expression levels to the Seurat object" and in addition we also ran UMAP with the `RunUMAP` function. Since a `Seurat` object is usually quite big and in this we don't need all the various functionality that comes with it, we've just saved some of the fields of the object.
+
+```{r eval=FALSE}
+cite_pca <- Embeddings(Reductions(cbmc, "pca"))
+cite_tsne <- Embeddings(Reductions(cbmc, "tsne"))
+cite_umap <- Embeddings(Reductions(cbmc, "umap"))
+cite_data <- GetAssayData(Assays(cbmc, "RNA"))[VariableFeatures(cbmc), ]
+```
+
+We've stored the resulting variables and you can download them from [here](cite_seurat.rda).
 
 ```{r}
+# install.packages("sleepwalk")
+library(sleepwalk)
+
 load("cite_seurat.rda")
 
-cbmc
+dim(cite_pca)
+dim(cite_tsne)
+dim(cite_umap)
+dim(cite_data)
 ```
 
 ## Basic example
 
-Now we a ready to make the most basic `sleepwalk` example. Here, we will show a t-SNE embedding and use Euclidean distances in PCA space to 
+Now, with all the data loaded, we a ready to make the most basic `sleepwalk` example. Here is how the most simple `sleepwalk` call looks like. It produces an app, that allows user to check how much distortion is introduced by dimensionality reduction. The first argument is a `n x 2` embedding matrix, the second one is a `n x m` feature matrix. We use PCA embedding instead of the expression values to avoid dimensionality curse that makes Euclidean distances in a too high dimensional space useless.
+
+```{r}
+sleepwalk(cite_tsne, cite_pca)
+```
+
+## Compare embeddings
+
+To compare two or more embeddings with `sleepwalk`, just provide them all as a list of matrices to the first argument (`embeddings`).  
+
+```{r}
+sleepwalk(list(cite_tsne, cite_umap), cite_pca, titles = c("t-SNE","UMAP"))
+```
+
+## Compare metrics
+
+It is also possible to compare metrics rather then embeddings. To this end one needs to select an embedding that will be used in visualization, and supply a list of feature matrices as the second argument (`features`). Optional argument `metric` specifies how to calculate distances in the given feature space. There are currently two implemented possibilities: Euclidean distance (`"euclid"`, default) and cosine distance (`"cosine"`).
+
+In this example we compare Euclidean and cosine distances in the PCA feature space and also Euclidean distance in the original feature space defined by the 2000 variable genes. 
+
+When you want to compare metrics with `sleepwalk` it's important to set `compare` to `"distances"`. If `compare = "embeddings"` (default), at any given moment `sleepwalk` colors corresponding points of each embedding in the same way to help user understand, how local neighbourhood changes in different embeddings.
+
+`nrow = 1` makes all three plots to be displayed in one row. 
+
+```{r}
+sleepwalk(cite_tsne, list(cite_pca, cite_pca, cite_data), 
+          metric = c("euclid", "cosine", "euclid"), 
+          titles = c("Euclidean", "Cosine", "Original"),
+          compare = "distances", nrow = 1)
+```
+
+It is also possible to use a precalculated distance matrices instead of feature matrices. For example, let's use correlation instead of cosine distance.
+
+```{r}
+dists <- as.matrix(dist(cite_pca))
+cors <- cor(t(cite_pca))
+
+sleepwalk(cite_tsne, distances = list(dists, cors), 
+          titles = c("Euclidean", "Correlation"), compare = "distances")
+```
+
+Of course, it is also possible to use different metrics for different embeddings.
+
+## Compare samples
+
+For this section we are going to switch to another dataset. Carter et al., (*A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum*, [Current Biology, 28:18](https://doi.org/10.1016/j.cub.2018.07.062), 2018) took multiple samples of developing murine cerebellum at various embryonic stages studied them with single cell RNA-Seq. For demonstration purposes, we'll use on part of data from this paper, namely, two biological replicates from time point E13.5 and one from E14.5. For each sample we've used Seurat to find variable genes and stored their log-normalized expression. The resulting matrices can be downloaded from [here]().
+
+```{r}
+load("cerebellum_expr.rda")
+
+dim(e13.5_A)
+dim(e13.5_B)
+dim(e14.5)
+```
+
+`sleepwalk` can be used to compare these samples to each other, by showing distance from a selected cell to all other cell in all the sample. For this to work, we need to make sure that all the samples 
+
+Let's say, several related single cell samples were sequenced independently, and we now want to see how similar or dissimilar are they to each other: Whether there are clusters of cells that are present in each sample, or groups, specific to a single one. 
+Sample comparison with `sleepwalk` works by calculating distances from one cell to 
+
+```{r}
+
+```

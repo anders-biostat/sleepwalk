@@ -13,4 +13,6 @@ examples/saveData\.R
 
 R/\.Rhistory
 
-tutorial/tutorial.nb.html
+tutorial/tutorial\.nb\.html
+
+tutorial/\.Rhistory

@@ -1751,18 +1751,151 @@ summary {
 <!-- rnb-text-begin -->
 <p>In this tutorial we will show how to use <code>sleepwalk</code> to check the faithfullness of a 2D embedding, compare different embeddings or distances and to check how similar to each other are multiple sets of elements (cells, samples, etc.).</p>
 <p>More information on <code>sleepwalk</code> can be found in our paper S. Ovchinnikova and S. Anders: <em>Exploring dimension-reduced embeddings with Sleepwalk.</em> Genome Research 30.5 (2020). <a href="https://doi.org/10.1101/gr.251447.119">doi:10.1101/gr.251447.119</a>. Here, we assume that reader is familiar with motivation behind <code>sleepwalk</code> and will focus only on its usage.</p>
-<p>First, let’s load some data. As an example, we use single cell RNA-Seq data from Stoeckius et al., <em>Simultaneous epitope and transcriptome measurement in single cells</em>, <a href="https://doi.org/10.1038/nmeth.4380">Nature Methods, 14:865</a>, 2017. The data were processed as it is described in the <a href="https://satijalab.org/seurat/multimodal_vignette.html">Seurat vignette</a>. We followed it until the section “Add the protein expression levels to the Seurat object” and then stored the resulting Seurat object. You can download it <a href="cite_seurat.rda">here</a></p>
+<p>First, let’s load some data. As an example, we use single cell RNA-Seq data from Stoeckius et al., <em>Simultaneous epitope and transcriptome measurement in single cells</em>, <a href="https://doi.org/10.1038/nmeth.4380">Nature Methods, 14:865</a>, 2017. The data were processed as it is described in the <a href="https://satijalab.org/seurat/multimodal_vignette.html">Seurat vignette</a>. We followed it until the section “Add the protein expression levels to the Seurat object” and in addition we also ran UMAP with the <code>RunUMAP</code> function. Since a <code>Seurat</code> object is usually quite big and in this we don’t need all the various functionality that comes with it, we’ve just saved some of the fields of the object.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbImNpdGVfcGNhIDwtIEVtYmVkZGluZ3MoUmVkdWN0aW9ucyhjYm1jLCBcInBjYVwiKSkiLCJjaXRlX3RzbmUgPC0gRW1iZWRkaW5ncyhSZWR1Y3Rpb25zKGNibWMsIFwidHNuZVwiKSkiLCJjaXRlX3VtYXAgPC0gRW1iZWRkaW5ncyhSZWR1Y3Rpb25zKGNibWMsIFwidW1hcFwiKSkiLCJjaXRlX2RhdGEgPC0gR2V0QXNzYXlEYXRhKEFzc2F5cyhjYm1jLCBcIlJOQVwiKSlbVmFyaWFibGVGZWF0dXJlcyhjYm1jKSwgXSJdfQ== -->
+<pre class="r"><code>cite_pca &lt;- Embeddings(Reductions(cbmc, &quot;pca&quot;))
+cite_tsne &lt;- Embeddings(Reductions(cbmc, &quot;tsne&quot;))
+cite_umap &lt;- Embeddings(Reductions(cbmc, &quot;umap&quot;))
+cite_data &lt;- GetAssayData(Assays(cbmc, &quot;RNA&quot;))[VariableFeatures(cbmc), ]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We’ve stored the resulting variables and you can download them from <a href="cite_seurat.rda">here</a>.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBpbnN0YWxsLnBhY2thZ2VzKFwic2xlZXB3YWxrXCIpXG5saWJyYXJ5KHNsZWVwd2FsaylcblxubG9hZChcImNpdGVfc2V1cmF0LnJkYVwiKVxuXG5kaW0oY2l0ZV9wY2EpXG5gYGAifQ== -->
+<pre class="r"><code># install.packages(&quot;sleepwalk&quot;)
+library(sleepwalk)
+
+load(&quot;cite_seurat.rda&quot;)
+
+dim(cite_pca)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDg2MTcgICA1MFxuIn0= -->
+<pre><code>[1] 8617   50</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGltKGNpdGVfdHNuZSlcbmBgYCJ9 -->
+<pre class="r"><code>dim(cite_tsne)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDg2MTcgICAgMlxuIn0= -->
+<pre><code>[1] 8617    2</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGltKGNpdGVfdW1hcClcbmBgYCJ9 -->
+<pre class="r"><code>dim(cite_umap)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDg2MTcgICAgMlxuIn0= -->
+<pre><code>[1] 8617    2</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGltKGNpdGVfZGF0YSlcbmBgYCJ9 -->
+<pre class="r"><code>dim(cite_data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDg2MTcgMjAwMFxuIn0= -->
+<pre><code>[1] 8617 2000</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <div id="basic-example" class="section level2">
 <h2>Basic example</h2>
-<p>Now we a ready to make the most basic <code>sleepwalk</code> example. Here, we will show a t-SNE embedding and use Euclidean distances in PCA space to</p>
+<p>Now, with all the data loaded, we a ready to make the most basic <code>sleepwalk</code> example. Here is how the most simple <code>sleepwalk</code> call looks like. It produces an app, that allows user to check how much distortion is introduced by dimensionality reduction. The first argument is a <code>n x 2</code> embedding matrix, the second one is a <code>n x m</code> feature matrix. We use PCA embedding instead of the expression values to avoid dimensionality curse that makes Euclidean distances in a too high dimensional space useless.</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2xlZXB3YWxrKGNpdGVfdHNuZSwgY2l0ZV9wY2EpXG5gYGAifQ== -->
+<pre class="r"><code>sleepwalk(cite_tsne, cite_pca)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXN0aW1hdGluZyAnbWF4ZGlzdCcgZm9yIGZlYXR1cmUgbWF0cml4IDFcbiJ9 -->
+<pre><code>Estimating &#39;maxdist&#39; for feature matrix 1</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="compare-embeddings" class="section level2">
+<h2>Compare embeddings</h2>
+<p>To compare two or more embeddings with <code>sleepwalk</code>, just provide them all as a list of matrices to the first argument (<code>embeddings</code>).</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2xlZXB3YWxrKGxpc3QoY2l0ZV90c25lLCBjaXRlX3VtYXApLCBjaXRlX3BjYSwgdGl0bGVzID0gYyhcInQtU05FXCIsXCJVTUFQXCIpKVxuYGBgIn0= -->
+<pre class="r"><code>sleepwalk(list(cite_tsne, cite_umap), cite_pca, titles = c(&quot;t-SNE&quot;,&quot;UMAP&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXN0aW1hdGluZyAnbWF4ZGlzdCcgZm9yIGZlYXR1cmUgbWF0cml4IDFcblNlcnZlciBoYXMgYmVlbiBzdG9wcGVkLlxuV2FybmluZyBtZXNzYWdlOlxuSW4gZnVuYyhyZXEpIDogRmlsZSAnL2Zhdmljb24uaWNvJyBpcyBub3QgZm91bmRcbiJ9 -->
+<pre><code>Estimating &#39;maxdist&#39; for feature matrix 1
+Server has been stopped.
+Warning message:
+In func(req) : File &#39;/favicon.ico&#39; is not found</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="compare-metrics" class="section level2">
+<h2>Compare metrics</h2>
+<p>It is also possible to compare metrics rather then embeddings. To this end one needs to select an embedding that will be used in visualization, and supply a list of feature matrices as the second argument (<code>features</code>). Optional argument <code>metric</code> specifies how to calculate distances in the given feature space. There are currently two implemented possibilities: Euclidean distance (<code>&quot;euclid&quot;</code>, default) and cosine distance (<code>&quot;cosine&quot;</code>).</p>
+<p>In this example we compare Euclidean and cosine distances in the PCA feature space and also Euclidean distance in the original feature space defined by the 2000 variable genes.</p>
+<p>When you want to compare metrics with <code>sleepwalk</code> it’s important to set <code>compare</code> to <code>&quot;distances&quot;</code>. If <code>compare = &quot;embeddings&quot;</code> (default), at any given moment <code>sleepwalk</code> colors corresponding points of each embedding in the same way to help user understand, how local neighbourhood changes in different embeddings.</p>
+<p><code>nrow = 1</code> makes all three plots to be displayed in one row.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2xlZXB3YWxrKGNpdGVfdHNuZSwgbGlzdChjaXRlX3BjYSwgY2l0ZV9wY2EsIGNpdGVfZGF0YSksIFxuICAgICAgICAgIG1ldHJpYyA9IGMoXCJldWNsaWRcIiwgXCJjb3NpbmVcIiwgXCJldWNsaWRcIiksIFxuICAgICAgICAgIHRpdGxlcyA9IGMoXCJFdWNsaWRlYW5cIiwgXCJDb3NpbmVcIiwgXCJPcmlnaW5hbFwiKSxcbiAgICAgICAgICBjb21wYXJlID0gXCJkaXN0YW5jZXNcIiwgbnJvdyA9IDEpXG5gYGAifQ== -->
+<pre class="r"><code>sleepwalk(cite_tsne, list(cite_pca, cite_pca, cite_data), 
+          metric = c(&quot;euclid&quot;, &quot;cosine&quot;, &quot;euclid&quot;), 
+          titles = c(&quot;Euclidean&quot;, &quot;Cosine&quot;, &quot;Original&quot;),
+          compare = &quot;distances&quot;, nrow = 1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXN0aW1hdGluZyAnbWF4ZGlzdCcgZm9yIGZlYXR1cmUgbWF0cml4IDFcbkVzdGltYXRpbmcgJ21heGRpc3QnIGZvciBmZWF0dXJlIG1hdHJpeCAyXG5Fc3RpbWF0aW5nICdtYXhkaXN0JyBmb3IgZmVhdHVyZSBtYXRyaXggM1xuU2VydmVyIGhhcyBiZWVuIHN0b3BwZWQuXG4ifQ== -->
+<pre><code>Estimating &#39;maxdist&#39; for feature matrix 1
+Estimating &#39;maxdist&#39; for feature matrix 2
+Estimating &#39;maxdist&#39; for feature matrix 3
+Server has been stopped.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>It is also possible to use a precalculated distance matrices instead of feature matrices. For example, let’s use correlation instead of cosine distance.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlzdHMgPC0gYXMubWF0cml4KGRpc3QoY2l0ZV9wY2EpKVxuYGBgIn0= -->
+<pre class="r"><code>dists &lt;- as.matrix(dist(cite_pca))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZyBtZXNzYWdlOlxuSW4gZnVuYyhyZXEpIDogRmlsZSAnL2Zhdmljb24uaWNvJyBpcyBub3QgZm91bmRcbiJ9 -->
+<pre><code>Warning message:
+In func(req) : File &#39;/favicon.ico&#39; is not found</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29ycyA8LSBjb3IodChjaXRlX3BjYSkpXG5cbnNsZWVwd2FsayhjaXRlX3RzbmUsIGRpc3RhbmNlcyA9IGxpc3QoZGlzdHMsIGNvcnMpLCBcbiAgICAgICAgICB0aXRsZXMgPSBjKFwiRXVjbGlkZWFuXCIsIFwiQ29ycmVsYXRpb25cIiksIGNvbXBhcmUgPSBcImRpc3RhbmNlc1wiKVxuYGBgIn0= -->
+<pre class="r"><code>cors &lt;- cor(t(cite_pca))
+
+sleepwalk(cite_tsne, distances = list(dists, cors), 
+          titles = c(&quot;Euclidean&quot;, &quot;Correlation&quot;), compare = &quot;distances&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiU2VydmVyIGhhcyBiZWVuIHN0b3BwZWQuXG5FcnJvciBpbiBjb2xsYXBzZSh0bXAsIGlubmVyID0gRkFMU0UsIGluZGVudCkgOiBcbiAgUiBjaGFyYWN0ZXIgc3RyaW5ncyBhcmUgbGltaXRlZCB0byAyXjMxLTEgYnl0ZXNcbiJ9 -->
+<pre><code>Server has been stopped.
+Error in collapse(tmp, inner = FALSE, indent) : 
+  R character strings are limited to 2^31-1 bytes</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Of course, it is also possible to use different metrics for different embeddings.</p>
+</div>
+<div id="compare-samples" class="section level2">
+<h2>Compare samples</h2>
+<p>For this section we are going to switch to another dataset. Carter et al., (<em>A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum</em>, <a href="https://doi.org/10.1016/j.cub.2018.07.062">Current Biology, 28:18</a>, 2018) took multiple samples of developing murine cerebellum at various embryonic stages studied them with single cell RNA-Seq. For demonstration purposes, we’ll use on part of data from this paper, namely, two biological replicates from time point E13.5 and one from E14.5. For each sample we’ve used Seurat to find variable genes and stored their log-normalized expression. The resulting matrices can be downloaded from <a href>here</a>.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9hZChcImNlcmViZWxsdW1fZXhwci5yZGFcIilcblxuZGltKGUxMy41X0EpXG5kaW0oZTEzLjVfQilcbmRpbShlMTQuNSlcbmBgYCJ9 -->
+<pre class="r"><code>load(&quot;cerebellum_expr.rda&quot;)
+
+dim(e13.5_A)
+dim(e13.5_B)
+dim(e14.5)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><code>sleepwalk</code> can be used to compare these samples to each other, by showing distance from a selected cell to all other cell in all the sample. For this to work, we need to make sure that all the samples</p>
+<p>Let’s say, several related single cell samples were sequenced independently, and we now want to see how similar or dissimilar are they to each other: Whether there are clusters of cells that are present in each sample, or groups, specific to a single one. Sample comparison with <code>sleepwalk</code> works by calculating distances from one cell to</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiU2xlZXB3YWxrIHR1dG9yaWFsIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpJbiB0aGlzIHR1dG9yaWFsIHdlIHdpbGwgc2hvdyBob3cgdG8gdXNlIGBzbGVlcHdhbGtgIHRvIGNoZWNrIHRoZSBmYWl0aGZ1bGxuZXNzIG9mIGEgMkQgZW1iZWRkaW5nLCBjb21wYXJlIGRpZmZlcmVudCBlbWJlZGRpbmdzIG9yIGRpc3RhbmNlcyBhbmQgdG8gY2hlY2sgaG93IHNpbWlsYXIgdG8gZWFjaCBvdGhlciBhcmUgbXVsdGlwbGUgc2V0cyBvZiBlbGVtZW50cyAoY2VsbHMsIHNhbXBsZXMsIGV0Yy4pLgoKTW9yZSBpbmZvcm1hdGlvbiBvbiBgc2xlZXB3YWxrYCBjYW4gYmUgZm91bmQgaW4gb3VyIHBhcGVyIFMuIE92Y2hpbm5pa292YSBhbmQgUy4gQW5kZXJzOiAqRXhwbG9yaW5nIGRpbWVuc2lvbi1yZWR1Y2VkIGVtYmVkZGluZ3Mgd2l0aCBTbGVlcHdhbGsuKiBHZW5vbWUgUmVzZWFyY2ggMzAuNSAoMjAyMCkuIFtkb2k6MTAuMTEwMS9nci4yNTE0NDcuMTE5XShodHRwczovL2RvaS5vcmcvMTAuMTEwMS9nci4yNTE0NDcuMTE5KS4gSGVyZSwgd2UgYXNzdW1lIHRoYXQgcmVhZGVyIGlzIGZhbWlsaWFyIHdpdGggbW90aXZhdGlvbiBiZWhpbmQgYHNsZWVwd2Fsa2AgYW5kIHdpbGwgZm9jdXMgb25seSBvbiBpdHMgdXNhZ2UuCgpGaXJzdCwgbGV0J3MgbG9hZCBzb21lIGRhdGEuIEFzIGFuIGV4YW1wbGUsIHdlIHVzZSBzaW5nbGUgY2VsbCBSTkEtU2VxIGRhdGEgZnJvbSBTdG9lY2tpdXMgZXQgYWwuLCAqU2ltdWx0YW5lb3VzIGVwaXRvcGUgYW5kIHRyYW5zY3JpcHRvbWUgbWVhc3VyZW1lbnQgaW4gc2luZ2xlIGNlbGxzKiwgW05hdHVyZSBNZXRob2RzLCAxNDo4NjVdKGh0dHBzOi8vZG9pLm9yZy8xMC4xMDM4L25tZXRoLjQzODApLCAyMDE3LiBUaGUgZGF0YSB3ZXJlIHByb2Nlc3NlZCBhcyBpdCBpcyBkZXNjcmliZWQgaW4gdGhlIFtTZXVyYXQgdmlnbmV0dGVdKGh0dHBzOi8vc2F0aWphbGFiLm9yZy9zZXVyYXQvbXVsdGltb2RhbF92aWduZXR0ZS5odG1sKS4gV2UgZm9sbG93ZWQgaXQgdW50aWwgdGhlIHNlY3Rpb24gIkFkZCB0aGUgcHJvdGVpbiBleHByZXNzaW9uIGxldmVscyB0byB0aGUgU2V1cmF0IG9iamVjdCIgYW5kIHRoZW4gc3RvcmVkIHRoZSByZXN1bHRpbmcgU2V1cmF0IG9iamVjdC4gWW91IGNhbiBkb3dubG9hZCBpdCBbaGVyZV0oY2l0ZV9zZXVyYXQucmRhKQoKYGBge3J9CmxvYWQoImNpdGVfc2V1cmF0LnJkYSIpCgpjYm1jCmBgYAoKIyMgQmFzaWMgZXhhbXBsZQoKTm93IHdlIGEgcmVhZHkgdG8gbWFrZSB0aGUgbW9zdCBiYXNpYyBgc2xlZXB3YWxrYCBleGFtcGxlLiBIZXJlLCB3ZSB3aWxsIHNob3cgYSB0LVNORSBlbWJlZGRpbmcgYW5kIHVzZSBFdWNsaWRlYW4gZGlzdGFuY2VzIGluIFBDQSBzcGFjZSB0byA=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiU2xlZXB3YWxrIHR1dG9yaWFsIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpJbiB0aGlzIHR1dG9yaWFsIHdlIHdpbGwgc2hvdyBob3cgdG8gdXNlIGBzbGVlcHdhbGtgIHRvIGNoZWNrIHRoZSBmYWl0aGZ1bGxuZXNzIG9mIGEgMkQgZW1iZWRkaW5nLCBjb21wYXJlIGRpZmZlcmVudCBlbWJlZGRpbmdzIG9yIGRpc3RhbmNlcyBhbmQgdG8gY2hlY2sgaG93IHNpbWlsYXIgdG8gZWFjaCBvdGhlciBhcmUgbXVsdGlwbGUgc2V0cyBvZiBlbGVtZW50cyAoY2VsbHMsIHNhbXBsZXMsIGV0Yy4pLgoKTW9yZSBpbmZvcm1hdGlvbiBvbiBgc2xlZXB3YWxrYCBjYW4gYmUgZm91bmQgaW4gb3VyIHBhcGVyIFMuIE92Y2hpbm5pa292YSBhbmQgUy4gQW5kZXJzOiAqRXhwbG9yaW5nIGRpbWVuc2lvbi1yZWR1Y2VkIGVtYmVkZGluZ3Mgd2l0aCBTbGVlcHdhbGsuKiBHZW5vbWUgUmVzZWFyY2ggMzAuNSAoMjAyMCkuIFtkb2k6MTAuMTEwMS9nci4yNTE0NDcuMTE5XShodHRwczovL2RvaS5vcmcvMTAuMTEwMS9nci4yNTE0NDcuMTE5KS4gSGVyZSwgd2UgYXNzdW1lIHRoYXQgcmVhZGVyIGlzIGZhbWlsaWFyIHdpdGggbW90aXZhdGlvbiBiZWhpbmQgYHNsZWVwd2Fsa2AgYW5kIHdpbGwgZm9jdXMgb25seSBvbiBpdHMgdXNhZ2UuCgpGaXJzdCwgbGV0J3MgbG9hZCBzb21lIGRhdGEuIEFzIGFuIGV4YW1wbGUsIHdlIHVzZSBzaW5nbGUgY2VsbCBSTkEtU2VxIGRhdGEgZnJvbSBTdG9lY2tpdXMgZXQgYWwuLCAqU2ltdWx0YW5lb3VzIGVwaXRvcGUgYW5kIHRyYW5zY3JpcHRvbWUgbWVhc3VyZW1lbnQgaW4gc2luZ2xlIGNlbGxzKiwgW05hdHVyZSBNZXRob2RzLCAxNDo4NjVdKGh0dHBzOi8vZG9pLm9yZy8xMC4xMDM4L25tZXRoLjQzODApLCAyMDE3LiBUaGUgZGF0YSB3ZXJlIHByb2Nlc3NlZCBhcyBpdCBpcyBkZXNjcmliZWQgaW4gdGhlIFtTZXVyYXQgdmlnbmV0dGVdKGh0dHBzOi8vc2F0aWphbGFiLm9yZy9zZXVyYXQvbXVsdGltb2RhbF92aWduZXR0ZS5odG1sKS4gV2UgZm9sbG93ZWQgaXQgdW50aWwgdGhlIHNlY3Rpb24gIkFkZCB0aGUgcHJvdGVpbiBleHByZXNzaW9uIGxldmVscyB0byB0aGUgU2V1cmF0IG9iamVjdCIgYW5kIGluIGFkZGl0aW9uIHdlIGFsc28gcmFuIFVNQVAgd2l0aCB0aGUgYFJ1blVNQVBgIGZ1bmN0aW9uLiBTaW5jZSBhIGBTZXVyYXRgIG9iamVjdCBpcyB1c3VhbGx5IHF1aXRlIGJpZyBhbmQgaW4gdGhpcyB3ZSBkb24ndCBuZWVkIGFsbCB0aGUgdmFyaW91cyBmdW5jdGlvbmFsaXR5IHRoYXQgY29tZXMgd2l0aCBpdCwgd2UndmUganVzdCBzYXZlZCBzb21lIG9mIHRoZSBmaWVsZHMgb2YgdGhlIG9iamVjdC4KCmBgYHtyIGV2YWw9RkFMU0V9CmNpdGVfcGNhIDwtIEVtYmVkZGluZ3MoUmVkdWN0aW9ucyhjYm1jLCAicGNhIikpCmNpdGVfdHNuZSA8LSBFbWJlZGRpbmdzKFJlZHVjdGlvbnMoY2JtYywgInRzbmUiKSkKY2l0ZV91bWFwIDwtIEVtYmVkZGluZ3MoUmVkdWN0aW9ucyhjYm1jLCAidW1hcCIpKQpjaXRlX2RhdGEgPC0gR2V0QXNzYXlEYXRhKEFzc2F5cyhjYm1jLCAiUk5BIikpW1ZhcmlhYmxlRmVhdHVyZXMoY2JtYyksIF0KYGBgCgpXZSd2ZSBzdG9yZWQgdGhlIHJlc3VsdGluZyB2YXJpYWJsZXMgYW5kIHlvdSBjYW4gZG93bmxvYWQgdGhlbSBmcm9tIFtoZXJlXShjaXRlX3NldXJhdC5yZGEpLgoKYGBge3J9CiMgaW5zdGFsbC5wYWNrYWdlcygic2xlZXB3YWxrIikKbGlicmFyeShzbGVlcHdhbGspCgpsb2FkKCJjaXRlX3NldXJhdC5yZGEiKQoKZGltKGNpdGVfcGNhKQpkaW0oY2l0ZV90c25lKQpkaW0oY2l0ZV91bWFwKQpkaW0oY2l0ZV9kYXRhKQpgYGAKCiMjIEJhc2ljIGV4YW1wbGUKCk5vdywgd2l0aCBhbGwgdGhlIGRhdGEgbG9hZGVkLCB3ZSBhIHJlYWR5IHRvIG1ha2UgdGhlIG1vc3QgYmFzaWMgYHNsZWVwd2Fsa2AgZXhhbXBsZS4gSGVyZSBpcyBob3cgdGhlIG1vc3Qgc2ltcGxlIGBzbGVlcHdhbGtgIGNhbGwgbG9va3MgbGlrZS4gSXQgcHJvZHVjZXMgYW4gYXBwLCB0aGF0IGFsbG93cyB1c2VyIHRvIGNoZWNrIGhvdyBtdWNoIGRpc3RvcnRpb24gaXMgaW50cm9kdWNlZCBieSBkaW1lbnNpb25hbGl0eSByZWR1Y3Rpb24uIFRoZSBmaXJzdCBhcmd1bWVudCBpcyBhIGBuIHggMmAgZW1iZWRkaW5nIG1hdHJpeCwgdGhlIHNlY29uZCBvbmUgaXMgYSBgbiB4IG1gIGZlYXR1cmUgbWF0cml4LiBXZSB1c2UgUENBIGVtYmVkZGluZyBpbnN0ZWFkIG9mIHRoZSBleHByZXNzaW9uIHZhbHVlcyB0byBhdm9pZCBkaW1lbnNpb25hbGl0eSBjdXJzZSB0aGF0IG1ha2VzIEV1Y2xpZGVhbiBkaXN0YW5jZXMgaW4gYSB0b28gaGlnaCBkaW1lbnNpb25hbCBzcGFjZSB1c2VsZXNzLgoKYGBge3J9CnNsZWVwd2FsayhjaXRlX3RzbmUsIGNpdGVfcGNhKQpgYGAKCiMjIENvbXBhcmUgZW1iZWRkaW5ncwoKVG8gY29tcGFyZSB0d28gb3IgbW9yZSBlbWJlZGRpbmdzIHdpdGggYHNsZWVwd2Fsa2AsIGp1c3QgcHJvdmlkZSB0aGVtIGFsbCBhcyBhIGxpc3Qgb2YgbWF0cmljZXMgdG8gdGhlIGZpcnN0IGFyZ3VtZW50IChgZW1iZWRkaW5nc2ApLiAgCgpgYGB7cn0Kc2xlZXB3YWxrKGxpc3QoY2l0ZV90c25lLCBjaXRlX3VtYXApLCBjaXRlX3BjYSwgdGl0bGVzID0gYygidC1TTkUiLCJVTUFQIikpCmBgYAoKIyMgQ29tcGFyZSBtZXRyaWNzCgpJdCBpcyBhbHNvIHBvc3NpYmxlIHRvIGNvbXBhcmUgbWV0cmljcyByYXRoZXIgdGhlbiBlbWJlZGRpbmdzLiBUbyB0aGlzIGVuZCBvbmUgbmVlZHMgdG8gc2VsZWN0IGFuIGVtYmVkZGluZyB0aGF0IHdpbGwgYmUgdXNlZCBpbiB2aXN1YWxpemF0aW9uLCBhbmQgc3VwcGx5IGEgbGlzdCBvZiBmZWF0dXJlIG1hdHJpY2VzIGFzIHRoZSBzZWNvbmQgYXJndW1lbnQgKGBmZWF0dXJlc2ApLiBPcHRpb25hbCBhcmd1bWVudCBgbWV0cmljYCBzcGVjaWZpZXMgaG93IHRvIGNhbGN1bGF0ZSBkaXN0YW5jZXMgaW4gdGhlIGdpdmVuIGZlYXR1cmUgc3BhY2UuIFRoZXJlIGFyZSBjdXJyZW50bHkgdHdvIGltcGxlbWVudGVkIHBvc3NpYmlsaXRpZXM6IEV1Y2xpZGVhbiBkaXN0YW5jZSAoYCJldWNsaWQiYCwgZGVmYXVsdCkgYW5kIGNvc2luZSBkaXN0YW5jZSAoYCJjb3NpbmUiYCkuCgpJbiB0aGlzIGV4YW1wbGUgd2UgY29tcGFyZSBFdWNsaWRlYW4gYW5kIGNvc2luZSBkaXN0YW5jZXMgaW4gdGhlIFBDQSBmZWF0dXJlIHNwYWNlIGFuZCBhbHNvIEV1Y2xpZGVhbiBkaXN0YW5jZSBpbiB0aGUgb3JpZ2luYWwgZmVhdHVyZSBzcGFjZSBkZWZpbmVkIGJ5IHRoZSAyMDAwIHZhcmlhYmxlIGdlbmVzLiAKCldoZW4geW91IHdhbnQgdG8gY29tcGFyZSBtZXRyaWNzIHdpdGggYHNsZWVwd2Fsa2AgaXQncyBpbXBvcnRhbnQgdG8gc2V0IGBjb21wYXJlYCB0byBgImRpc3RhbmNlcyJgLiBJZiBgY29tcGFyZSA9ICJlbWJlZGRpbmdzImAgKGRlZmF1bHQpLCBhdCBhbnkgZ2l2ZW4gbW9tZW50IGBzbGVlcHdhbGtgIGNvbG9ycyBjb3JyZXNwb25kaW5nIHBvaW50cyBvZiBlYWNoIGVtYmVkZGluZyBpbiB0aGUgc2FtZSB3YXkgdG8gaGVscCB1c2VyIHVuZGVyc3RhbmQsIGhvdyBsb2NhbCBuZWlnaGJvdXJob29kIGNoYW5nZXMgaW4gZGlmZmVyZW50IGVtYmVkZGluZ3MuCgpgbnJvdyA9IDFgIG1ha2VzIGFsbCB0aHJlZSBwbG90cyB0byBiZSBkaXNwbGF5ZWQgaW4gb25lIHJvdy4gCgpgYGB7cn0Kc2xlZXB3YWxrKGNpdGVfdHNuZSwgbGlzdChjaXRlX3BjYSwgY2l0ZV9wY2EsIGNpdGVfZGF0YSksIAogICAgICAgICAgbWV0cmljID0gYygiZXVjbGlkIiwgImNvc2luZSIsICJldWNsaWQiKSwgCiAgICAgICAgICB0aXRsZXMgPSBjKCJFdWNsaWRlYW4iLCAiQ29zaW5lIiwgIk9yaWdpbmFsIiksCiAgICAgICAgICBjb21wYXJlID0gImRpc3RhbmNlcyIsIG5yb3cgPSAxKQpgYGAKCkl0IGlzIGFsc28gcG9zc2libGUgdG8gdXNlIGEgcHJlY2FsY3VsYXRlZCBkaXN0YW5jZSBtYXRyaWNlcyBpbnN0ZWFkIG9mIGZlYXR1cmUgbWF0cmljZXMuIEZvciBleGFtcGxlLCBsZXQncyB1c2UgY29ycmVsYXRpb24gaW5zdGVhZCBvZiBjb3NpbmUgZGlzdGFuY2UuCgpgYGB7cn0KZGlzdHMgPC0gYXMubWF0cml4KGRpc3QoY2l0ZV9wY2EpKQpjb3JzIDwtIGNvcih0KGNpdGVfcGNhKSkKCnNsZWVwd2FsayhjaXRlX3RzbmUsIGRpc3RhbmNlcyA9IGxpc3QoZGlzdHMsIGNvcnMpLCAKICAgICAgICAgIHRpdGxlcyA9IGMoIkV1Y2xpZGVhbiIsICJDb3JyZWxhdGlvbiIpLCBjb21wYXJlID0gImRpc3RhbmNlcyIpCmBgYAoKT2YgY291cnNlLCBpdCBpcyBhbHNvIHBvc3NpYmxlIHRvIHVzZSBkaWZmZXJlbnQgbWV0cmljcyBmb3IgZGlmZmVyZW50IGVtYmVkZGluZ3MuCgojIyBDb21wYXJlIHNhbXBsZXMKCkZvciB0aGlzIHNlY3Rpb24gd2UgYXJlIGdvaW5nIHRvIHN3aXRjaCB0byBhbm90aGVyIGRhdGFzZXQuIENhcnRlciBldCBhbC4sICgqQSBTaW5nbGUtQ2VsbCBUcmFuc2NyaXB0aW9uYWwgQXRsYXMgb2YgdGhlIERldmVsb3BpbmcgTXVyaW5lIENlcmViZWxsdW0qLCBbQ3VycmVudCBCaW9sb2d5LCAyODoxOF0oaHR0cHM6Ly9kb2kub3JnLzEwLjEwMTYvai5jdWIuMjAxOC4wNy4wNjIpLCAyMDE4KSB0b29rIG11bHRpcGxlIHNhbXBsZXMgb2YgZGV2ZWxvcGluZyBtdXJpbmUgY2VyZWJlbGx1bSBhdCB2YXJpb3VzIGVtYnJ5b25pYyBzdGFnZXMgc3R1ZGllZCB0aGVtIHdpdGggc2luZ2xlIGNlbGwgUk5BLVNlcS4gRm9yIGRlbW9uc3RyYXRpb24gcHVycG9zZXMsIHdlJ2xsIHVzZSBvbiBwYXJ0IG9mIGRhdGEgZnJvbSB0aGlzIHBhcGVyLCBuYW1lbHksIHR3byBiaW9sb2dpY2FsIHJlcGxpY2F0ZXMgZnJvbSB0aW1lIHBvaW50IEUxMy41IGFuZCBvbmUgZnJvbSBFMTQuNS4gRm9yIGVhY2ggc2FtcGxlIHdlJ3ZlIHVzZWQgU2V1cmF0IHRvIGZpbmQgdmFyaWFibGUgZ2VuZXMgYW5kIHN0b3JlZCB0aGVpciBsb2ctbm9ybWFsaXplZCBleHByZXNzaW9uLiBUaGUgcmVzdWx0aW5nIG1hdHJpY2VzIGNhbiBiZSBkb3dubG9hZGVkIGZyb20gW2hlcmVdKCkuCgpgYGB7cn0KbG9hZCgiY2VyZWJlbGx1bV9leHByLnJkYSIpCgpkaW0oZTEzLjVfQSkKZGltKGUxMy41X0IpCmRpbShlMTQuNSkKYGBgCgpgc2xlZXB3YWxrYCBjYW4gYmUgdXNlZCB0byBjb21wYXJlIHRoZXNlIHNhbXBsZXMgdG8gZWFjaCBvdGhlciwgYnkgc2hvd2luZyBkaXN0YW5jZSBmcm9tIGEgc2VsZWN0ZWQgY2VsbCB0byBhbGwgb3RoZXIgY2VsbCBpbiBhbGwgdGhlIHNhbXBsZS4gRm9yIHRoaXMgdG8gd29yaywgd2UgbmVlZCB0byBtYWtlIHN1cmUgdGhhdCBhbGwgdGhlIHNhbXBsZXMgCgpMZXQncyBzYXksIHNldmVyYWwgcmVsYXRlZCBzaW5nbGUgY2VsbCBzYW1wbGVzIHdlcmUgc2VxdWVuY2VkIGluZGVwZW5kZW50bHksIGFuZCB3ZSBub3cgd2FudCB0byBzZWUgaG93IHNpbWlsYXIgb3IgZGlzc2ltaWxhciBhcmUgdGhleSB0byBlYWNoIG90aGVyOiBXaGV0aGVyIHRoZXJlIGFyZSBjbHVzdGVycyBvZiBjZWxscyB0aGF0IGFyZSBwcmVzZW50IGluIGVhY2ggc2FtcGxlLCBvciBncm91cHMsIHNwZWNpZmljIHRvIGEgc2luZ2xlIG9uZS4gClNhbXBsZSBjb21wYXJpc29uIHdpdGggYHNsZWVwd2Fsa2Agd29ya3MgYnkgY2FsY3VsYXRpbmcgZGlzdGFuY2VzIGZyb20gb25lIGNlbGwgdG8gCgpgYGB7cn0KCmBgYA==</div>
 
 
 
