@@ -1,3 +1,7 @@
+# sleepwalk 0.3.2
+
+* `jrc` now (v.0.5.0) uses `setLimits` function for all the security restriction. This update fixes the dependency problem caused by that change.
+
 # sleepwalk 0.3.1
 
 * broken path to the start page, caused by `jrc` update fixed
