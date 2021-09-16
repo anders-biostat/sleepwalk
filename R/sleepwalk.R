@@ -79,7 +79,7 @@
 #' 
 #' @author Simon Anders, Svetlana Ovchinnikova
 #' 
-#' @references \url{https://doi.org/10.1101/603589}
+#' @references \doi{10.1101/603589}
 #'
 #' @examples 
 #' #generate cockscrew-shaped 3D data with 3 additional noisy dimensions

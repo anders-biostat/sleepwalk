@@ -4,7 +4,9 @@
 \name{.slw}
 \alias{.slw}
 \title{Variable to store the information about the current \code{sleepwalk} session.}
-\format{An object of class \code{environment} of length 0.}
+\format{
+An object of class \code{environment} of length 0.
+}
 \usage{
 .slw
 }

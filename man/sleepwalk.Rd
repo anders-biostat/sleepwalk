@@ -133,7 +133,7 @@ sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)),
   
 }
 \references{
-\url{https://doi.org/10.1101/603589}
+\doi{10.1101/603589}
 }
 \author{
 Simon Anders, Svetlana Ovchinnikova
