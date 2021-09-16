@@ -3,9 +3,9 @@
 This version fixes issues caused by an update of the `jrc` package to version 0.5.0
 
 ## Test environments
-* local ubuntu 20.04 LST, R 4.0.3
+* local ubuntu 20.04 LST, R 4.1.1
 * win-builder: R-devel
-* ubuntu 16.04.6 LTS, R-devel, R 4.0.2, R 3.6.3 (travis ci)
+* Ubuntu 20.04.1 LTS, R-release, Windows Server 2008 R2 SP1, R-devel, Fedora Linux, R-devel (rhub)
 
 ## R CMD check results
 
