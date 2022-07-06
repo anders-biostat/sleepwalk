@@ -135,7 +135,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
     .slw$on_selection <- function(points, emb) {
       if(length(points) > 0){
         message(paste0("You've selected ", length(points), " points from the embedding ", emb, "."))
-        message(paste0("To access them, plese, specify a callback function by setting the 'on_selection' argument."))
+        message(paste0("To access them, please specify a callback function by setting the 'on_selection' argument."))
       }
     }
   } else {
