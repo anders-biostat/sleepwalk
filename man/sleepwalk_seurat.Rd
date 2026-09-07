@@ -69,5 +69,5 @@ sleepwalk_seurat(pbmc_small, embedding = "tsne", feature = "data")
 
 }
 \author{
-Simon Anders, Svetlana Ovchinnikova
+Simon Anders, Svetlana Ovchinnikova, Claude
 }

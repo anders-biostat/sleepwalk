@@ -38,7 +38,7 @@
 #'
 #' @return None. See \code{\link{sleepwalk}}.
 #'
-#' @author Simon Anders, Svetlana Ovchinnikova
+#' @author Simon Anders, Svetlana Ovchinnikova, Claude
 #'
 #' @examples
 #' \donttest{
