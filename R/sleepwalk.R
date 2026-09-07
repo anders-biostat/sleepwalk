@@ -228,8 +228,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
   if(is.null(maxdists)) {
     if(!is.null(featureMatrices)) {
       maxdists <- sapply(1:length(featureMatrices), function(i) {
-        message(paste0("Estimating 'maxdist' for feature matrix "), i)
-        pairs <- cbind(sample(nrow(featureMatrices[[i]]), 1500, TRUE), 
+        pairs <- cbind(sample(nrow(featureMatrices[[i]]), 1500, TRUE),
                        sample(nrow(featureMatrices[[i]]), 1500, TRUE))
         if(metric[i] == "euclid")  {
           median(sqrt(rowSums((featureMatrices[[i]][pairs[, 1], , drop = FALSE] - featureMatrices[[i]][pairs[, 2], , drop = FALSE])^2)))
