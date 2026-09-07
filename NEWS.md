@@ -1,3 +1,16 @@
+# sleepwalk 0.3.3
+
+* New `sleepwalk_seurat()` function: a convenience wrapper that pulls a 2D
+embedding and a feature matrix straight from a `Seurat` object's
+dimensional reductions and assay data, instead of having to extract them
+yourself.
+
+* Added a favicon, silencing a spurious "File '/favicon.ico' is not found"
+warning that every browser session used to print.
+
+* Removed a superfluous "Estimating 'maxdist' for feature matrix N" message
+printed whenever `maxdists` isn't given explicitly.
+
 # sleepwalk 0.3.2
 
 * `jrc` now (v.0.5.0) uses `setLimits` function for all the security restriction. This update fixes the dependency problem caused by that change.

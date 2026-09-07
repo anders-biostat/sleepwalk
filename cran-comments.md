@@ -1,15 +1,23 @@
 ## Resubmission
 
-This version fixes issues caused by an update of the `jrc` package to version 0.5.0
+This version adds a new `sleepwalk_seurat()` convenience function for
+`Seurat` objects, fixes a spurious "favicon.ico not found" warning, and
+removes a superfluous progress message. See NEWS.md for details.
 
 ## Test environments
-* local ubuntu 20.04 LST, R 4.1.1
-* win-builder: R-devel
-* Ubuntu 20.04.1 LTS, R-release, Windows Server 2008 R2 SP1, R-devel, Fedora Linux, R-devel (rhub)
+* local Linux Mint 22.3, R 4.6.1
+
+Not yet run on win-builder/R-hub - do that before submitting.
 
 ## R CMD check results
 
 There were no ERRORS, WARNINGS or NOTES
+
+(`R CMD check --run-donttest` does hit a timeout in `sleepwalk()`'s own
+pre-existing example, which opens a real interactive browser session -
+expected in a headless environment with no browser to complete the
+WebSocket handshake, and not something CRAN's default check runs into,
+since it doesn't execute `\donttest{}` examples.)
 
 
 # Previous cran-comments
