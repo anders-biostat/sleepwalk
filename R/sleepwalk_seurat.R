@@ -45,9 +45,14 @@
 #' library(Seurat)
 #' data("pbmc_small")
 #'
-#' # compares the tSNE embedding against distances in PCA space, a standard
-#' # scRNA-seq QC check: does the embedding respect PCA-space neighborhoods?
-#' sleepwalk_seurat(pbmc_small, embedding = "tsne", feature = "pca")
+#' # using the defaults (embedding = "umap", feature = "pca"): compares the
+#' # UMAP embedding against distances in PCA space, a standard scRNA-seq QC
+#' # check - does the embedding respect PCA-space neighborhoods?
+#' pbmc_small <- RunUMAP(pbmc_small, dims = 1:15)
+#' sleepwalk_seurat(pbmc_small)
+#'
+#' # same idea, against the tSNE embedding instead
+#' sleepwalk_seurat(pbmc_small, embedding = "tsne", feature = "pca", pointSize = 4)
 #'
 #' # colour by distances in (variable-feature) expression space instead
 #' sleepwalk_seurat(pbmc_small, embedding = "tsne", feature = "data")
