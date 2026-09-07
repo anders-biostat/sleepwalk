@@ -2,6 +2,7 @@
 
 export(.slw)
 export(sleepwalk)
+export(sleepwalk_seurat)
 export(slw_snapshot)
 import(ggplot2)
 import(jrc)
