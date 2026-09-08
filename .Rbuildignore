@@ -1,5 +1,6 @@
 ^CRAN-RELEASE$
 ^\.travis\.yml$
+^\.github$
 Readme.md
 LICENSE
 test
