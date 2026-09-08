@@ -6,12 +6,17 @@ removes a superfluous progress message. See NEWS.md for details.
 
 ## Test environments
 * local Linux Mint 22.3, R 4.6.1
-
-Not yet run on win-builder/R-hub - do that before submitting.
+* win-builder: R-devel (submitted; check maintainer inbox for the report)
+* R-hub v2 (GitHub Actions): Linux, Windows, macOS, all R-devel
 
 ## R CMD check results
 
 There were no ERRORS, WARNINGS or NOTES
+
+R-hub initially flagged a NOTE ("Found the following hidden files and
+directories: .github") from this package's own R-hub CI workflow file
+not being excluded from the build; fixed via .Rbuildignore and
+reconfirmed clean with a local R CMD check.
 
 (`R CMD check --run-donttest` does hit a timeout in `sleepwalk()`'s own
 pre-existing example, which opens a real interactive browser session -
