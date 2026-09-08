@@ -122,7 +122,7 @@ data[, 1:3] <- data[, 1:3] + points
 
 pca <- prcomp(data)
 
-\donttest{#compare Euclidean distance with the real position on the helix
+\dontrun{#compare Euclidean distance with the real position on the helix
 sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)), 
           compare = "distances", pointSize = 3)}
 #the same, but with saving the web page to an HTML file
