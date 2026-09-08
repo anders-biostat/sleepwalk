@@ -99,7 +99,7 @@
 #' 
 #' pca <- prcomp(data)
 #' 
-#' \donttest{#compare Euclidean distance with the real position on the helix
+#' \dontrun{#compare Euclidean distance with the real position on the helix
 #' sleepwalk(list(pca$x[, 1:2], pca$x[, 1:2]), list(data, as.matrix(ts)), 
 #'           compare = "distances", pointSize = 3)}
 #' #the same, but with saving the web page to an HTML file
@@ -328,7 +328,7 @@ sleepwalk <- function( embeddings, featureMatrices = NULL, maxdists = NULL, poin
 #' 
 #' @return a \code{ggplot} object or a list of \code{ggplot} objects.
 #' @examples 
-#' \donttest{data("iris")
+#' \dontrun{data("iris")
 #' sleepwalk(iris[, c(1,3)], iris[1:4], pointSize = 4)
 #' slw_snapshot(10)}
 #' 

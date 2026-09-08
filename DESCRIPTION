@@ -19,3 +19,4 @@ Suggests: Seurat
 URL: https://anders-biostat.github.io/sleepwalk/
 BugReports: https://github.com/anders-biostat/sleepwalk/issues
 Config/roxygen2/version: 8.1.0
+Encoding: UTF-8

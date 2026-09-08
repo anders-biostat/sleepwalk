@@ -55,7 +55,6 @@ object's dimensional reductions and assay data, instead of having to
 extract them yourself.
 }
 \examples{
-\donttest{
 library(Seurat)
 data("pbmc_small")
 
@@ -63,6 +62,7 @@ data("pbmc_small")
 # UMAP embedding against distances in PCA space, a standard scRNA-seq QC
 # check - does the embedding respect PCA-space neighborhoods?
 pbmc_small <- RunUMAP(pbmc_small, dims = 1:15)
+\dontrun{
 sleepwalk_seurat(pbmc_small)
 
 # same idea, against the tSNE embedding instead
